@@ -1,1 +1,2072 @@
-{"metadata":{"kernelspec":{"language":"python","display_name":"Python 3","name":"python3"},"language_info":{"name":"python","version":"3.12.12","mimetype":"text/x-python","codemirror_mode":{"name":"ipython","version":3},"pygments_lexer":"ipython3","nbconvert_exporter":"python","file_extension":".py"},"kaggle":{"accelerator":"gpu","dataSources":[{"sourceId":112509,"databundleVersionId":14254895,"sourceType":"competition"},{"sourceId":13900620,"sourceType":"datasetVersion","datasetId":8856212,"isSourceIdPinned":false},{"sourceId":14018229,"sourceType":"datasetVersion","datasetId":8929818,"isSourceIdPinned":false},{"sourceId":288467413,"sourceType":"kernelVersion"},{"sourceId":288761108,"sourceType":"kernelVersion"},{"sourceId":4537,"sourceType":"modelInstanceVersion","modelInstanceId":3329,"modelId":986},{"sourceId":268942,"sourceType":"modelInstanceVersion","modelInstanceId":230141,"modelId":251887},{"sourceId":663314,"sourceType":"modelInstanceVersion","modelInstanceId":471723,"modelId":487624}],"dockerImageVersionId":31234,"isInternetEnabled":false,"language":"python","sourceType":"notebook","isGpuEnabled":true}},"nbformat_minor":4,"nbformat":4,"cells":[{"cell_type":"code","source":"# This Python 3 environment comes with many helpful analytics libraries installed\n# It is defined by the kaggle/python Docker image: https://github.com/kaggle/docker-python\n# For example, here's several helpful packages to load\n\nimport numpy as np # linear algebra\nimport pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)\n\n# Input data files are available in the read-only \"../input/\" directory\n# For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory\n\nimport os\nfor dirname, _, filenames in os.walk('/kaggle/input'):\n    for filename in filenames:\n        print(os.path.join(dirname, filename))\n\n# You can write up to 20GB to the current directory (/kaggle/working/) that gets preserved as output when you create a version using \"Save & Run All\" \n# You can also write temporary files to /kaggle/temp/, but they won't be saved outside of the current session","metadata":{"_uuid":"51e1b95a-cf50-4259-906b-fbf334258d3d","_cell_guid":"5061a83f-9d83-4302-9d3a-659adc5273a7","trusted":true,"collapsed":false,"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2025-12-28T20:01:01.820430Z","iopub.execute_input":"2025-12-28T20:01:01.820683Z","iopub.status.idle":"2025-12-28T20:01:03.100426Z","shell.execute_reply.started":"2025-12-28T20:01:01.820659Z","shell.execute_reply":"2025-12-28T20:01:03.099799Z"}},"outputs":[{"name":"stdout","text":"/kaggle/input/csiro-image-embeddings/train_siglip_embeddings.csv\n/kaggle/input/csiro-image-embeddings/train_dino_embeddings.csv\n/kaggle/input/google-siglip-so400m-patch14-384/transformers/default/1/config.json\n/kaggle/input/google-siglip-so400m-patch14-384/transformers/default/1/preprocessor_config.json\n/kaggle/input/google-siglip-so400m-patch14-384/transformers/default/1/spiece.model\n/kaggle/input/google-siglip-so400m-patch14-384/transformers/default/1/README.md\n/kaggle/input/google-siglip-so400m-patch14-384/transformers/default/1/tokenizer.json\n/kaggle/input/google-siglip-so400m-patch14-384/transformers/default/1/tokenizer_config.json\n/kaggle/input/google-siglip-so400m-patch14-384/transformers/default/1/gitattributes\n/kaggle/input/google-siglip-so400m-patch14-384/transformers/default/1/model.safetensors\n/kaggle/input/google-siglip-so400m-patch14-384/transformers/default/1/special_tokens_map.json\n/kaggle/input/csiro/pytorch/default/12/fold_0/metrics.csv\n/kaggle/input/csiro/pytorch/default/12/fold_0/swanlab_info.json\n/kaggle/input/csiro/pytorch/default/12/fold_0/checkpoints/best_loss.pt\n/kaggle/input/csiro/pytorch/default/12/fold_0/checkpoints/best_wr2.pt\n/kaggle/input/csiro/pytorch/default/12/fold_0/checkpoints/last.pt\n/kaggle/input/csiro/pytorch/default/12/fold_4/metrics.csv\n/kaggle/input/csiro/pytorch/default/12/fold_4/swanlab_info.json\n/kaggle/input/csiro/pytorch/default/12/fold_4/checkpoints/best_loss.pt\n/kaggle/input/csiro/pytorch/default/12/fold_4/checkpoints/best_wr2.pt\n/kaggle/input/csiro/pytorch/default/12/fold_4/checkpoints/last.pt\n/kaggle/input/csiro/pytorch/default/12/fold_1/metrics.csv\n/kaggle/input/csiro/pytorch/default/12/fold_1/swanlab_info.json\n/kaggle/input/csiro/pytorch/default/12/fold_1/checkpoints/best_loss.pt\n/kaggle/input/csiro/pytorch/default/12/fold_1/checkpoints/best_wr2.pt\n/kaggle/input/csiro/pytorch/default/12/fold_1/checkpoints/last.pt\n/kaggle/input/csiro/pytorch/default/12/fold_3/metrics.csv\n/kaggle/input/csiro/pytorch/default/12/fold_3/swanlab_info.json\n/kaggle/input/csiro/pytorch/default/12/fold_3/checkpoints/best_loss.pt\n/kaggle/input/csiro/pytorch/default/12/fold_3/checkpoints/best_wr2.pt\n/kaggle/input/csiro/pytorch/default/12/fold_3/checkpoints/last.pt\n/kaggle/input/csiro/pytorch/default/12/fold_2/metrics.csv\n/kaggle/input/csiro/pytorch/default/12/fold_2/swanlab_info.json\n/kaggle/input/csiro/pytorch/default/12/fold_2/checkpoints/best_loss.pt\n/kaggle/input/csiro/pytorch/default/12/fold_2/checkpoints/best_wr2.pt\n/kaggle/input/csiro/pytorch/default/12/fold_2/checkpoints/last.pt\n/kaggle/input/csiro-biomass/sample_submission.csv\n/kaggle/input/csiro-biomass/train.csv\n/kaggle/input/csiro-biomass/test.csv\n/kaggle/input/csiro-biomass/test/ID1001187975.jpg\n/kaggle/input/csiro-biomass/train/ID2099464826.jpg\n/kaggle/input/csiro-biomass/train/ID2037861084.jpg\n/kaggle/input/csiro-biomass/train/ID1211362607.jpg\n/kaggle/input/csiro-biomass/train/ID1853508321.jpg\n/kaggle/input/csiro-biomass/train/ID193102215.jpg\n/kaggle/input/csiro-biomass/train/ID698608346.jpg\n/kaggle/input/csiro-biomass/train/ID1859251563.jpg\n/kaggle/input/csiro-biomass/train/ID1880764911.jpg\n/kaggle/input/csiro-biomass/train/ID853954911.jpg\n/kaggle/input/csiro-biomass/train/ID1403107574.jpg\n/kaggle/input/csiro-biomass/train/ID1781353117.jpg\n/kaggle/input/csiro-biomass/train/ID384648061.jpg\n/kaggle/input/csiro-biomass/train/ID1563418511.jpg\n/kaggle/input/csiro-biomass/train/ID2125100696.jpg\n/kaggle/input/csiro-biomass/train/ID482555369.jpg\n/kaggle/input/csiro-biomass/train/ID638711343.jpg\n/kaggle/input/csiro-biomass/train/ID779628955.jpg\n/kaggle/input/csiro-biomass/train/ID1876271942.jpg\n/kaggle/input/csiro-biomass/train/ID1692894460.jpg\n/kaggle/input/csiro-biomass/train/ID746335827.jpg\n/kaggle/input/csiro-biomass/train/ID1136169672.jpg\n/kaggle/input/csiro-biomass/train/ID1471216911.jpg\n/kaggle/input/csiro-biomass/train/ID846154859.jpg\n/kaggle/input/csiro-biomass/train/ID1294770420.jpg\n/kaggle/input/csiro-biomass/train/ID1183807388.jpg\n/kaggle/input/csiro-biomass/train/ID423506847.jpg\n/kaggle/input/csiro-biomass/train/ID1889150649.jpg\n/kaggle/input/csiro-biomass/train/ID1140993511.jpg\n/kaggle/input/csiro-biomass/train/ID1413758094.jpg\n/kaggle/input/csiro-biomass/train/ID1545077474.jpg\n/kaggle/input/csiro-biomass/train/ID95050718.jpg\n/kaggle/input/csiro-biomass/train/ID528010569.jpg\n/kaggle/input/csiro-biomass/train/ID1645161155.jpg\n/kaggle/input/csiro-biomass/train/ID786365141.jpg\n/kaggle/input/csiro-biomass/train/ID896386823.jpg\n/kaggle/input/csiro-biomass/train/ID1025234388.jpg\n/kaggle/input/csiro-biomass/train/ID663006174.jpg\n/kaggle/input/csiro-biomass/train/ID1509266870.jpg\n/kaggle/input/csiro-biomass/train/ID1496750796.jpg\n/kaggle/input/csiro-biomass/train/ID471758347.jpg\n/kaggle/input/csiro-biomass/train/ID740402124.jpg\n/kaggle/input/csiro-biomass/train/ID1624268863.jpg\n/kaggle/input/csiro-biomass/train/ID1098771283.jpg\n/kaggle/input/csiro-biomass/train/ID710341728.jpg\n/kaggle/input/csiro-biomass/train/ID2086966681.jpg\n/kaggle/input/csiro-biomass/train/ID1573329652.jpg\n/kaggle/input/csiro-biomass/train/ID54128926.jpg\n/kaggle/input/csiro-biomass/train/ID50027657.jpg\n/kaggle/input/csiro-biomass/train/ID1559189397.jpg\n/kaggle/input/csiro-biomass/train/ID290369222.jpg\n/kaggle/input/csiro-biomass/train/ID1590632667.jpg\n/kaggle/input/csiro-biomass/train/ID552040066.jpg\n/kaggle/input/csiro-biomass/train/ID488873801.jpg\n/kaggle/input/csiro-biomass/train/ID363069566.jpg\n/kaggle/input/csiro-biomass/train/ID1839139621.jpg\n/kaggle/input/csiro-biomass/train/ID1131079710.jpg\n/kaggle/input/csiro-biomass/train/ID2010625680.jpg\n/kaggle/input/csiro-biomass/train/ID152157478.jpg\n/kaggle/input/csiro-biomass/train/ID1357758282.jpg\n/kaggle/input/csiro-biomass/train/ID1498398599.jpg\n/kaggle/input/csiro-biomass/train/ID679913293.jpg\n/kaggle/input/csiro-biomass/train/ID697718693.jpg\n/kaggle/input/csiro-biomass/train/ID4464212.jpg\n/kaggle/input/csiro-biomass/train/ID1275072698.jpg\n/kaggle/input/csiro-biomass/train/ID1579942839.jpg\n/kaggle/input/csiro-biomass/train/ID799079114.jpg\n/kaggle/input/csiro-biomass/train/ID1415329644.jpg\n/kaggle/input/csiro-biomass/train/ID1510574031.jpg\n/kaggle/input/csiro-biomass/train/ID1078930021.jpg\n/kaggle/input/csiro-biomass/train/ID1456861072.jpg\n/kaggle/input/csiro-biomass/train/ID930534670.jpg\n/kaggle/input/csiro-biomass/train/ID13162390.jpg\n/kaggle/input/csiro-biomass/train/ID567744300.jpg\n/kaggle/input/csiro-biomass/train/ID344618040.jpg\n/kaggle/input/csiro-biomass/train/ID566966892.jpg\n/kaggle/input/csiro-biomass/train/ID1437386574.jpg\n/kaggle/input/csiro-biomass/train/ID667059550.jpg\n/kaggle/input/csiro-biomass/train/ID72895391.jpg\n/kaggle/input/csiro-biomass/train/ID1193692654.jpg\n/kaggle/input/csiro-biomass/train/ID1386202352.jpg\n/kaggle/input/csiro-biomass/train/ID871463897.jpg\n/kaggle/input/csiro-biomass/train/ID2096636211.jpg\n/kaggle/input/csiro-biomass/train/ID2003438517.jpg\n/kaggle/input/csiro-biomass/train/ID21377800.jpg\n/kaggle/input/csiro-biomass/train/ID230058600.jpg\n/kaggle/input/csiro-biomass/train/ID1753847361.jpg\n/kaggle/input/csiro-biomass/train/ID1512751450.jpg\n/kaggle/input/csiro-biomass/train/ID12390962.jpg\n/kaggle/input/csiro-biomass/train/ID1746343319.jpg\n/kaggle/input/csiro-biomass/train/ID978026131.jpg\n/kaggle/input/csiro-biomass/train/ID383231615.jpg\n/kaggle/input/csiro-biomass/train/ID146920896.jpg\n/kaggle/input/csiro-biomass/train/ID1036339023.jpg\n/kaggle/input/csiro-biomass/train/ID1168534540.jpg\n/kaggle/input/csiro-biomass/train/ID1859792585.jpg\n/kaggle/input/csiro-biomass/train/ID1251029854.jpg\n/kaggle/input/csiro-biomass/train/ID1113329413.jpg\n/kaggle/input/csiro-biomass/train/ID1874904894.jpg\n/kaggle/input/csiro-biomass/train/ID1671844336.jpg\n/kaggle/input/csiro-biomass/train/ID1831254380.jpg\n/kaggle/input/csiro-biomass/train/ID1103883611.jpg\n/kaggle/input/csiro-biomass/train/ID797502182.jpg\n/kaggle/input/csiro-biomass/train/ID1784585001.jpg\n/kaggle/input/csiro-biomass/train/ID1058383417.jpg\n/kaggle/input/csiro-biomass/train/ID1488408526.jpg\n/kaggle/input/csiro-biomass/train/ID429799190.jpg\n/kaggle/input/csiro-biomass/train/ID1291116815.jpg\n/kaggle/input/csiro-biomass/train/ID1516374298.jpg\n/kaggle/input/csiro-biomass/train/ID1618597318.jpg\n/kaggle/input/csiro-biomass/train/ID1345375788.jpg\n/kaggle/input/csiro-biomass/train/ID686797154.jpg\n/kaggle/input/csiro-biomass/train/ID1139866256.jpg\n/kaggle/input/csiro-biomass/train/ID1149598723.jpg\n/kaggle/input/csiro-biomass/train/ID212206250.jpg\n/kaggle/input/csiro-biomass/train/ID112966473.jpg\n/kaggle/input/csiro-biomass/train/ID1540480250.jpg\n/kaggle/input/csiro-biomass/train/ID544444725.jpg\n/kaggle/input/csiro-biomass/train/ID1513184765.jpg\n/kaggle/input/csiro-biomass/train/ID668330410.jpg\n/kaggle/input/csiro-biomass/train/ID1444674500.jpg\n/kaggle/input/csiro-biomass/train/ID1962379474.jpg\n/kaggle/input/csiro-biomass/train/ID605134229.jpg\n/kaggle/input/csiro-biomass/train/ID914754166.jpg\n/kaggle/input/csiro-biomass/train/ID354528442.jpg\n/kaggle/input/csiro-biomass/train/ID950496197.jpg\n/kaggle/input/csiro-biomass/train/ID1395011773.jpg\n/kaggle/input/csiro-biomass/train/ID1357768767.jpg\n/kaggle/input/csiro-biomass/train/ID210865340.jpg\n/kaggle/input/csiro-biomass/train/ID936984905.jpg\n/kaggle/input/csiro-biomass/train/ID1976436386.jpg\n/kaggle/input/csiro-biomass/train/ID1215977190.jpg\n/kaggle/input/csiro-biomass/train/ID803479541.jpg\n/kaggle/input/csiro-biomass/train/ID1244346858.jpg\n/kaggle/input/csiro-biomass/train/ID158170916.jpg\n/kaggle/input/csiro-biomass/train/ID1208644039.jpg\n/kaggle/input/csiro-biomass/train/ID1314135397.jpg\n/kaggle/input/csiro-biomass/train/ID1012260530.jpg\n/kaggle/input/csiro-biomass/train/ID1053972079.jpg\n/kaggle/input/csiro-biomass/train/ID656251220.jpg\n/kaggle/input/csiro-biomass/train/ID1084819986.jpg\n/kaggle/input/csiro-biomass/train/ID1337107565.jpg\n/kaggle/input/csiro-biomass/train/ID1268934251.jpg\n/kaggle/input/csiro-biomass/train/ID617132135.jpg\n/kaggle/input/csiro-biomass/train/ID1472525822.jpg\n/kaggle/input/csiro-biomass/train/ID668475812.jpg\n/kaggle/input/csiro-biomass/train/ID681680726.jpg\n/kaggle/input/csiro-biomass/train/ID1476045099.jpg\n/kaggle/input/csiro-biomass/train/ID1570190541.jpg\n/kaggle/input/csiro-biomass/train/ID1403078396.jpg\n/kaggle/input/csiro-biomass/train/ID2030696575.jpg\n/kaggle/input/csiro-biomass/train/ID1782608354.jpg\n/kaggle/input/csiro-biomass/train/ID194823383.jpg\n/kaggle/input/csiro-biomass/train/ID196516535.jpg\n/kaggle/input/csiro-biomass/train/ID212206832.jpg\n/kaggle/input/csiro-biomass/train/ID1638922597.jpg\n/kaggle/input/csiro-biomass/train/ID1457700382.jpg\n/kaggle/input/csiro-biomass/train/ID1989506559.jpg\n/kaggle/input/csiro-biomass/train/ID789169173.jpg\n/kaggle/input/csiro-biomass/train/ID1634731537.jpg\n/kaggle/input/csiro-biomass/train/ID1428837636.jpg\n/kaggle/input/csiro-biomass/train/ID2006686196.jpg\n/kaggle/input/csiro-biomass/train/ID885388135.jpg\n/kaggle/input/csiro-biomass/train/ID1789853061.jpg\n/kaggle/input/csiro-biomass/train/ID1655778545.jpg\n/kaggle/input/csiro-biomass/train/ID697059386.jpg\n/kaggle/input/csiro-biomass/train/ID121331988.jpg\n/kaggle/input/csiro-biomass/train/ID2099742797.jpg\n/kaggle/input/csiro-biomass/train/ID342818398.jpg\n/kaggle/input/csiro-biomass/train/ID317990700.jpg\n/kaggle/input/csiro-biomass/train/ID706288721.jpg\n/kaggle/input/csiro-biomass/train/ID1159071020.jpg\n/kaggle/input/csiro-biomass/train/ID755710743.jpg\n/kaggle/input/csiro-biomass/train/ID1254829053.jpg\n/kaggle/input/csiro-biomass/train/ID475010202.jpg\n/kaggle/input/csiro-biomass/train/ID1693880739.jpg\n/kaggle/input/csiro-biomass/train/ID1894998379.jpg\n/kaggle/input/csiro-biomass/train/ID48303557.jpg\n/kaggle/input/csiro-biomass/train/ID1385921939.jpg\n/kaggle/input/csiro-biomass/train/ID147528735.jpg\n/kaggle/input/csiro-biomass/train/ID407646960.jpg\n/kaggle/input/csiro-biomass/train/ID1035947949.jpg\n/kaggle/input/csiro-biomass/train/ID1119761112.jpg\n/kaggle/input/csiro-biomass/train/ID1988033238.jpg\n/kaggle/input/csiro-biomass/train/ID1857489997.jpg\n/kaggle/input/csiro-biomass/train/ID742198710.jpg\n/kaggle/input/csiro-biomass/train/ID588120964.jpg\n/kaggle/input/csiro-biomass/train/ID431471530.jpg\n/kaggle/input/csiro-biomass/train/ID353424190.jpg\n/kaggle/input/csiro-biomass/train/ID380752847.jpg\n/kaggle/input/csiro-biomass/train/ID2069766023.jpg\n/kaggle/input/csiro-biomass/train/ID600602588.jpg\n/kaggle/input/csiro-biomass/train/ID560946727.jpg\n/kaggle/input/csiro-biomass/train/ID1011485656.jpg\n/kaggle/input/csiro-biomass/train/ID808079729.jpg\n/kaggle/input/csiro-biomass/train/ID1217108125.jpg\n/kaggle/input/csiro-biomass/train/ID1623964968.jpg\n/kaggle/input/csiro-biomass/train/ID980878870.jpg\n/kaggle/input/csiro-biomass/train/ID793526563.jpg\n/kaggle/input/csiro-biomass/train/ID397994621.jpg\n/kaggle/input/csiro-biomass/train/ID975115267.jpg\n/kaggle/input/csiro-biomass/train/ID1237349078.jpg\n/kaggle/input/csiro-biomass/train/ID684383343.jpg\n/kaggle/input/csiro-biomass/train/ID866684633.jpg\n/kaggle/input/csiro-biomass/train/ID1665142816.jpg\n/kaggle/input/csiro-biomass/train/ID2048645043.jpg\n/kaggle/input/csiro-biomass/train/ID1953171547.jpg\n/kaggle/input/csiro-biomass/train/ID1451025862.jpg\n/kaggle/input/csiro-biomass/train/ID71885430.jpg\n/kaggle/input/csiro-biomass/train/ID307060225.jpg\n/kaggle/input/csiro-biomass/train/ID969218269.jpg\n/kaggle/input/csiro-biomass/train/ID980538882.jpg\n/kaggle/input/csiro-biomass/train/ID1028611175.jpg\n/kaggle/input/csiro-biomass/train/ID670276799.jpg\n/kaggle/input/csiro-biomass/train/ID2002797732.jpg\n/kaggle/input/csiro-biomass/train/ID1374789439.jpg\n/kaggle/input/csiro-biomass/train/ID473494649.jpg\n/kaggle/input/csiro-biomass/train/ID1993907137.jpg\n/kaggle/input/csiro-biomass/train/ID1962197151.jpg\n/kaggle/input/csiro-biomass/train/ID828217731.jpg\n/kaggle/input/csiro-biomass/train/ID972274220.jpg\n/kaggle/input/csiro-biomass/train/ID1954669045.jpg\n/kaggle/input/csiro-biomass/train/ID1354190372.jpg\n/kaggle/input/csiro-biomass/train/ID1458758610.jpg\n/kaggle/input/csiro-biomass/train/ID40849327.jpg\n/kaggle/input/csiro-biomass/train/ID1952813879.jpg\n/kaggle/input/csiro-biomass/train/ID572336285.jpg\n/kaggle/input/csiro-biomass/train/ID1473228876.jpg\n/kaggle/input/csiro-biomass/train/ID1963715583.jpg\n/kaggle/input/csiro-biomass/train/ID1463690813.jpg\n/kaggle/input/csiro-biomass/train/ID1899025384.jpg\n/kaggle/input/csiro-biomass/train/ID386216505.jpg\n/kaggle/input/csiro-biomass/train/ID1789265307.jpg\n/kaggle/input/csiro-biomass/train/ID315357834.jpg\n/kaggle/input/csiro-biomass/train/ID2089023774.jpg\n/kaggle/input/csiro-biomass/train/ID520514019.jpg\n/kaggle/input/csiro-biomass/train/ID1970522802.jpg\n/kaggle/input/csiro-biomass/train/ID1139918758.jpg\n/kaggle/input/csiro-biomass/train/ID1051144034.jpg\n/kaggle/input/csiro-biomass/train/ID1370004842.jpg\n/kaggle/input/csiro-biomass/train/ID761508093.jpg\n/kaggle/input/csiro-biomass/train/ID2052993274.jpg\n/kaggle/input/csiro-biomass/train/ID1277756619.jpg\n/kaggle/input/csiro-biomass/train/ID6269659.jpg\n/kaggle/input/csiro-biomass/train/ID1574125908.jpg\n/kaggle/input/csiro-biomass/train/ID135365668.jpg\n/kaggle/input/csiro-biomass/train/ID1182523622.jpg\n/kaggle/input/csiro-biomass/train/ID554314721.jpg\n/kaggle/input/csiro-biomass/train/ID1049634115.jpg\n/kaggle/input/csiro-biomass/train/ID1127246618.jpg\n/kaggle/input/csiro-biomass/train/ID900012207.jpg\n/kaggle/input/csiro-biomass/train/ID574213894.jpg\n/kaggle/input/csiro-biomass/train/ID415656958.jpg\n/kaggle/input/csiro-biomass/train/ID61833032.jpg\n/kaggle/input/csiro-biomass/train/ID2053315094.jpg\n/kaggle/input/csiro-biomass/train/ID550623196.jpg\n/kaggle/input/csiro-biomass/train/ID657448172.jpg\n/kaggle/input/csiro-biomass/train/ID1675365449.jpg\n/kaggle/input/csiro-biomass/train/ID2014192906.jpg\n/kaggle/input/csiro-biomass/train/ID162394992.jpg\n/kaggle/input/csiro-biomass/train/ID968643034.jpg\n/kaggle/input/csiro-biomass/train/ID684062938.jpg\n/kaggle/input/csiro-biomass/train/ID802547515.jpg\n/kaggle/input/csiro-biomass/train/ID294150104.jpg\n/kaggle/input/csiro-biomass/train/ID1618145129.jpg\n/kaggle/input/csiro-biomass/train/ID956512130.jpg\n/kaggle/input/csiro-biomass/train/ID142751858.jpg\n/kaggle/input/csiro-biomass/train/ID325799913.jpg\n/kaggle/input/csiro-biomass/train/ID443091455.jpg\n/kaggle/input/csiro-biomass/train/ID661372352.jpg\n/kaggle/input/csiro-biomass/train/ID1062837331.jpg\n/kaggle/input/csiro-biomass/train/ID498304885.jpg\n/kaggle/input/csiro-biomass/train/ID187238869.jpg\n/kaggle/input/csiro-biomass/train/ID1450399782.jpg\n/kaggle/input/csiro-biomass/train/ID2056023629.jpg\n/kaggle/input/csiro-biomass/train/ID576621307.jpg\n/kaggle/input/csiro-biomass/train/ID1199150612.jpg\n/kaggle/input/csiro-biomass/train/ID1411613934.jpg\n/kaggle/input/csiro-biomass/train/ID105271783.jpg\n/kaggle/input/csiro-biomass/train/ID1703304524.jpg\n/kaggle/input/csiro-biomass/train/ID875119737.jpg\n/kaggle/input/csiro-biomass/train/ID1176292407.jpg\n/kaggle/input/csiro-biomass/train/ID1729002155.jpg\n/kaggle/input/csiro-biomass/train/ID2091439402.jpg\n/kaggle/input/csiro-biomass/train/ID576137678.jpg\n/kaggle/input/csiro-biomass/train/ID1946311744.jpg\n/kaggle/input/csiro-biomass/train/ID1982662138.jpg\n/kaggle/input/csiro-biomass/train/ID983582017.jpg\n/kaggle/input/csiro-biomass/train/ID661817669.jpg\n/kaggle/input/csiro-biomass/train/ID753699705.jpg\n/kaggle/input/csiro-biomass/train/ID1789834546.jpg\n/kaggle/input/csiro-biomass/train/ID529933668.jpg\n/kaggle/input/csiro-biomass/train/ID490139972.jpg\n/kaggle/input/csiro-biomass/train/ID743847993.jpg\n/kaggle/input/csiro-biomass/train/ID7850481.jpg\n/kaggle/input/csiro-biomass/train/ID1088965591.jpg\n/kaggle/input/csiro-biomass/train/ID629980789.jpg\n/kaggle/input/csiro-biomass/train/ID1119739385.jpg\n/kaggle/input/csiro-biomass/train/ID1477176296.jpg\n/kaggle/input/csiro-biomass/train/ID1113121340.jpg\n/kaggle/input/csiro-biomass/train/ID2131261930.jpg\n/kaggle/input/csiro-biomass/train/ID2145635095.jpg\n/kaggle/input/csiro-biomass/train/ID1414371018.jpg\n/kaggle/input/csiro-biomass/train/ID1148666289.jpg\n/kaggle/input/csiro-biomass/train/ID839432753.jpg\n/kaggle/input/csiro-biomass/train/ID157479394.jpg\n/kaggle/input/csiro-biomass/train/ID1761544403.jpg\n/kaggle/input/csiro-biomass/train/ID846984946.jpg\n/kaggle/input/csiro-biomass/train/ID751517087.jpg\n/kaggle/input/csiro-biomass/train/ID577112774.jpg\n/kaggle/input/csiro-biomass/train/ID353997899.jpg\n/kaggle/input/csiro-biomass/train/ID748979397.jpg\n/kaggle/input/csiro-biomass/train/ID1070112260.jpg\n/kaggle/input/csiro-biomass/train/ID1108283583.jpg\n/kaggle/input/csiro-biomass/train/ID1868719645.jpg\n/kaggle/input/csiro-biomass/train/ID1980675327.jpg\n/kaggle/input/csiro-biomass/train/ID1163061745.jpg\n/kaggle/input/csiro-biomass/train/ID1148528732.jpg\n/kaggle/input/csiro-biomass/train/ID534966093.jpg\n/kaggle/input/csiro-biomass/train/ID1717006117.jpg\n/kaggle/input/csiro-biomass/train/ID1953218650.jpg\n/kaggle/input/csiro-biomass/train/ID633775166.jpg\n/kaggle/input/csiro-biomass/train/ID808093827.jpg\n/kaggle/input/csiro-biomass/train/ID1997244125.jpg\n/kaggle/input/csiro-biomass/train/ID1920959057.jpg\n/kaggle/input/csiro-biomass/train/ID1948354837.jpg\n/kaggle/input/csiro-biomass/train/ID364856705.jpg\n/kaggle/input/csiro-biomass/train/ID249042826.jpg\n/kaggle/input/csiro-biomass/train/ID332742639.jpg\n/kaggle/input/csiro-biomass/train/ID1680597197.jpg\n/kaggle/input/csiro-biomass/train/ID1421714468.jpg\n/kaggle/input/csiro-biomass/train/ID905397692.jpg\n/kaggle/input/csiro-biomass/train/ID1782509721.jpg\n/kaggle/input/csiro-biomass/train/ID141370843.jpg\n/kaggle/input/csiro-biomass/train/ID2056982009.jpg\n/kaggle/input/csiro-biomass/train/ID94564238.jpg\n/kaggle/input/csiro-biomass/train/ID8209776.jpg\n/kaggle/input/csiro-biomass/train/ID908524512.jpg\n/kaggle/input/csiro-biomass/train/ID610397481.jpg\n/kaggle/input/csiro-biomass/train/ID750820644.jpg\n/kaggle/input/csiro-biomass/train/ID1515990019.jpg\n/kaggle/input/csiro-biomass/train/ID1547945326.jpg\n/kaggle/input/csiro-biomass/train/ID587125778.jpg\n/kaggle/input/csiro-biomass/train/ID1620371305.jpg\n/kaggle/input/csiro-biomass/train/ID1474775613.jpg\n/kaggle/input/csiro-biomass/train/ID545360459.jpg\n/kaggle/input/csiro-biomass/train/ID1783499590.jpg\n/kaggle/input/csiro-biomass/train/ID1249094008.jpg\n/kaggle/input/csiro-biomass/train/ID1525817840.jpg\n/kaggle/input/csiro-biomass/train/ID227847873.jpg\n/kaggle/input/csiro-biomass/train/ID1052620238.jpg\n/kaggle/input/csiro-biomass/train/ID1888700589.jpg\n/kaggle/input/csiro-biomass/train/ID2052442675.jpg\n/kaggle/input/csiro-biomass/train/ID963903358.jpg\n/kaggle/input/csiro-biomass/train/ID1121692672.jpg\n/kaggle/input/csiro-biomass/train/ID1343327476.jpg\n/kaggle/input/csiro-biomass/train/ID1667778338.jpg\n/kaggle/input/csiro-biomass/train/ID257822026.jpg\n/kaggle/input/csiro-mvp-models/model1.pth\n/kaggle/input/csiro-mvp-models/model2.pth\n/kaggle/input/csiro-mvp-models/model10.pth\n/kaggle/input/csiro-mvp-models/model7.pth\n/kaggle/input/csiro-mvp-models/model6.pth\n/kaggle/input/csiro-mvp-models/model4.pth\n/kaggle/input/csiro-mvp-models/model5.pth\n/kaggle/input/csiro-mvp-models/model9.pth\n/kaggle/input/csiro-mvp-models/model3.pth\n/kaggle/input/csiro-mvp-models/model8.pth\n/kaggle/input/dinov2/pytorch/giant/1/config.json\n/kaggle/input/dinov2/pytorch/giant/1/preprocessor_config.json\n/kaggle/input/dinov2/pytorch/giant/1/README.md\n/kaggle/input/dinov2/pytorch/giant/1/pytorch_model.bin\n/kaggle/input/dinov2/pytorch/giant/1/.gitattributes\n/kaggle/input/csiro-datasplit/__results__.html\n/kaggle/input/csiro-datasplit/csiro_data_split.csv\n/kaggle/input/csiro-datasplit/__notebook__.ipynb\n/kaggle/input/csiro-datasplit/__output__.json\n/kaggle/input/csiro-datasplit/custom.css\n/kaggle/input/csiro-biomass-competition-comprehensive-eda/__results__.html\n/kaggle/input/csiro-biomass-competition-comprehensive-eda/__notebook__.ipynb\n/kaggle/input/csiro-biomass-competition-comprehensive-eda/__output__.json\n/kaggle/input/csiro-biomass-competition-comprehensive-eda/custom.css\n/kaggle/input/csiro-biomass-competition-comprehensive-eda/__results___files/__results___15_0.png\n/kaggle/input/csiro-biomass-competition-comprehensive-eda/__results___files/__results___25_0.png\n/kaggle/input/csiro-biomass-competition-comprehensive-eda/__results___files/__results___19_0.png\n/kaggle/input/csiro-biomass-competition-comprehensive-eda/__results___files/__results___31_0.png\n/kaggle/input/csiro-biomass-competition-comprehensive-eda/__results___files/__results___22_0.png\n/kaggle/input/csiro-biomass-competition-comprehensive-eda/__results___files/__results___28_0.png\n","output_type":"stream"}],"execution_count":1},{"cell_type":"code","source":"# ================================================================\n# CSIRO BIOMASS COMPETITION - PROFESSIONAL EDA\n# ================================================================\n# Professional visualizations with consistent color scheme\n# Complete statistical analysis with bell curves and annotations\n# ================================================================\n\nimport os\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as sns\nimport cv2\nfrom PIL import Image\nfrom pathlib import Path\nfrom tqdm.auto import tqdm\nimport warnings\nwarnings.filterwarnings('ignore')\n\nfrom scipy import stats\nfrom scipy.stats import skew, kurtosis, normaltest, pearsonr, spearmanr, norm\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.decomposition import PCA\n\n# ================================================================\n# PROFESSIONAL STYLING CONFIGURATION\n# ================================================================\n\n# Professional color palette (consistent across all plots)\nCOLORS = {\n    'primary': '#2E4057',      # Dark blue-gray (main)\n    'secondary': '#048A81',     # Teal (accent)\n    'tertiary': '#54C6EB',      # Light blue\n    'highlight': '#D95D39',     # Coral red (emphasis)\n    'neutral': '#8B8B8B',       # Gray\n    'background': '#F5F5F5',    # Light gray background\n    'grid': '#E0E0E0',          # Grid color\n    'text': '#2C3E50'           # Dark text\n}\n\n# Set professional matplotlib style\nplt.style.use('seaborn-v0_8-whitegrid')\nplt.rcParams.update({\n    'figure.figsize': (12, 7),\n    'font.size': 11,\n    'axes.labelsize': 12,\n    'axes.titlesize': 14,\n    'xtick.labelsize': 10,\n    'ytick.labelsize': 10,\n    'legend.fontsize': 10,\n    'figure.titlesize': 16,\n    'axes.facecolor': COLORS['background'],\n    'figure.facecolor': 'white',\n    'axes.edgecolor': COLORS['neutral'],\n    'grid.color': COLORS['grid'],\n    'grid.alpha': 0.3,\n    'text.color': COLORS['text'],\n    'axes.labelcolor': COLORS['text'],\n    'xtick.color': COLORS['text'],\n    'ytick.color': COLORS['text']\n})\n\n# ================================================================\n# CONFIGURATION\n# ================================================================\n\nclass Config:\n    BASE_PATH = Path(\"/kaggle/input/csiro-biomass/\")\n    TRAIN_PATH = BASE_PATH / \"train\"\n    TEST_PATH = BASE_PATH / \"test\"\n    OUTPUT_PATH = Path(\"/kaggle/working/\")\n    \n    TARGET_COLS = ['Dry_Green_g', 'Dry_Dead_g', 'Dry_Clover_g', 'GDM_g', 'Dry_Total_g']\n    TARGET_NAMES = {\n        'Dry_Green_g': 'Green Biomass',\n        'Dry_Dead_g': 'Dead Biomass',\n        'Dry_Clover_g': 'Clover Biomass',\n        'GDM_g': 'Green Dry Matter',\n        'Dry_Total_g': 'Total Biomass'\n    }\n    \n    TARGET_WEIGHTS = {\n        'Dry_Green_g': 0.1,\n        'Dry_Dead_g': 0.1,\n        'Dry_Clover_g': 0.1,\n        'GDM_g': 0.2,\n        'Dry_Total_g': 0.5,\n    }\n\ncfg = Config()\n\nprint(\"=\"*80)\nprint(\"CSIRO BIOMASS COMPETITION - PROFESSIONAL EDA\")\nprint(\"=\"*80)\n\n# ================================================================\n# LOAD DATA\n# ================================================================\n\nprint(\"\\nLoading data...\")\ntrain_df = pd.read_csv(cfg.BASE_PATH / \"train.csv\")\ntest_df = pd.read_csv(cfg.BASE_PATH / \"test.csv\")\n\nprint(f\"Train shape: {train_df.shape}\")\nprint(f\"Test shape: {test_df.shape}\")\n\n# Pivot to get one row per image\ntrain_pivot = train_df.pivot_table(\n    values='target',\n    index='image_path',\n    columns='target_name',\n    aggfunc='mean'\n).reset_index()\n\nprint(f\"Pivoted train shape: {train_pivot.shape}\")\n\n# ================================================================\n# 1. COMPREHENSIVE TARGET DISTRIBUTION WITH BELL CURVES\n# ================================================================\n\nprint(\"\\n\" + \"=\"*80)\nprint(\"Creating Visualization 1: Target Distributions with Normal Curves\")\nprint(\"=\"*80)\n\nfig = plt.figure(figsize=(20, 12))\ngs = fig.add_gridspec(3, 2, hspace=0.3, wspace=0.25)\n\nfor idx, col in enumerate(cfg.TARGET_COLS):\n    row = idx // 2\n    col_idx = idx % 2\n    ax = fig.add_subplot(gs[row, col_idx])\n    \n    values = train_pivot[col].dropna().values\n    \n    # Histogram\n    n, bins, patches = ax.hist(values, bins=40, alpha=0.6, color=COLORS['primary'], \n                                edgecolor='white', linewidth=1.5, density=True,\n                                label='Observed Distribution')\n    \n    # Fit normal distribution\n    mu, sigma = values.mean(), values.std()\n    x = np.linspace(values.min(), values.max(), 100)\n    normal_curve = norm.pdf(x, mu, sigma)\n    \n    # Plot normal curve\n    ax.plot(x, normal_curve, color=COLORS['highlight'], linewidth=3, \n            label=f'Normal Fit (μ={mu:.1f}, σ={sigma:.1f})', linestyle='--')\n    \n    # Statistics lines\n    ax.axvline(mu, color=COLORS['secondary'], linestyle='-', linewidth=2.5, \n               label=f'Mean: {mu:.2f}g', alpha=0.8)\n    ax.axvline(np.median(values), color=COLORS['tertiary'], linestyle='-', linewidth=2.5,\n               label=f'Median: {np.median(values):.2f}g', alpha=0.8)\n    \n    # Annotations\n    ax.text(0.98, 0.97, f'n = {len(values):,}', transform=ax.transAxes,\n            verticalalignment='top', horizontalalignment='right',\n            bbox=dict(boxstyle='round', facecolor='white', alpha=0.9, edgecolor=COLORS['neutral']),\n            fontsize=10, fontweight='bold')\n    \n    # Statistical properties\n    skewness = skew(values)\n    kurt = kurtosis(values)\n    stats_text = f'Skewness: {skewness:.2f}\\nKurtosis: {kurt:.2f}\\nMin: {values.min():.2f}g\\nMax: {values.max():.2f}g'\n    ax.text(0.02, 0.97, stats_text, transform=ax.transAxes,\n            verticalalignment='top', horizontalalignment='left',\n            bbox=dict(boxstyle='round', facecolor='white', alpha=0.9, edgecolor=COLORS['neutral']),\n            fontsize=9)\n    \n    # Labels and title\n    ax.set_xlabel(f'{cfg.TARGET_NAMES[col]} (grams)', fontsize=12, fontweight='bold')\n    ax.set_ylabel('Probability Density', fontsize=12, fontweight='bold')\n    ax.set_title(f'{cfg.TARGET_NAMES[col]} Distribution', \n                 fontsize=14, fontweight='bold', pad=15, color=COLORS['text'])\n    ax.legend(loc='upper right', framealpha=0.95, edgecolor=COLORS['neutral'])\n    ax.grid(True, alpha=0.3, linestyle='--')\n    ax.spines['top'].set_visible(False)\n    ax.spines['right'].set_visible(False)\n\n# Add overall title\nfig.suptitle('Target Variable Distributions with Statistical Analysis', \n             fontsize=18, fontweight='bold', y=0.995, color=COLORS['text'])\n\nplt.savefig(cfg.OUTPUT_PATH / 'professional_1_distributions.png', dpi=300, bbox_inches='tight', \n            facecolor='white', edgecolor='none')\nprint(\"✓ Saved: professional_1_distributions.png\")\nplt.close()\n\n# ================================================================\n# 2. COMPREHENSIVE CORRELATION MATRIX  \n# ================================================================\n\nprint(\"\\n\" + \"=\"*80)\nprint(\"Creating Visualization 2: Complete Correlation Matrix\")\nprint(\"=\"*80)\n\n# Calculate correlations\ncorrelation_matrix = train_pivot[cfg.TARGET_COLS].corr()\n\n# Create simple figure\nfig, ax = plt.subplots(figsize=(12, 10))\n\n# Professional RED-WHITE-GREEN diverging colormap\n# Red (negative) → White/Yellow (zero) → Green (positive)\nfrom matplotlib.colors import LinearSegmentedColormap\ncolors_cmap = [\n    '#D73027',  # Dark red (strong negative)\n    '#FC8D59',  # Medium red\n    '#FEE090',  # Light red/orange\n    '#FFFFBF',  # White/Yellow (zero)\n    '#E0F3DB',  # Very light green\n    '#A8DDB5',  # Light green\n    '#66C2A4',  # Medium light green\n    '#2CA25F',  # Medium green\n    '#006D2C'   # Dark green (strong positive)\n]\nn_bins = 100\ncmap_diverging = LinearSegmentedColormap.from_list('red_white_green', colors_cmap, N=n_bins)\n\n# Create heatmap with full range -1 to 1\nim = ax.imshow(correlation_matrix, cmap=cmap_diverging, aspect='auto', vmin=-1, vmax=1)\n\n# Set ticks\nax.set_xticks(np.arange(len(cfg.TARGET_COLS)))\nax.set_yticks(np.arange(len(cfg.TARGET_COLS)))\nax.set_xticklabels([cfg.TARGET_NAMES[col] for col in cfg.TARGET_COLS], \n                    rotation=45, ha='right', fontsize=11, fontweight='bold')\nax.set_yticklabels([cfg.TARGET_NAMES[col] for col in cfg.TARGET_COLS], \n                    fontsize=11, fontweight='bold')\n\n# Add correlation values and significance\nfor i in range(len(cfg.TARGET_COLS)):\n    for j in range(len(cfg.TARGET_COLS)):\n        corr_val = correlation_matrix.iloc[i, j]\n        \n        # Calculate p-value\n        if i != j:\n            _, p_val = pearsonr(train_pivot[cfg.TARGET_COLS[i]], \n                               train_pivot[cfg.TARGET_COLS[j]])\n            sig = '***' if p_val < 0.001 else '**' if p_val < 0.01 else '*' if p_val < 0.05 else ''\n        else:\n            sig = ''\n        \n        # Choose text color based on correlation value\n        # Dark text for light colors (near zero), white text for dark colors (strong correlations)\n        if abs(corr_val) > 0.6:\n            text_color = 'white'\n        else:\n            text_color = 'black'\n        \n        # Main correlation value\n        ax.text(j, i, f'{corr_val:.3f}', ha='center', va='center',\n                color=text_color, fontsize=12, fontweight='bold')\n        \n        # Significance stars\n        if sig:\n            ax.text(j, i + 0.35, sig, ha='center', va='center',\n                    color=text_color, fontsize=10, fontweight='bold')\n\n# Colorbar with professional labels\ncbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)\ncbar.set_label('Pearson Correlation Coefficient (r)', rotation=270, labelpad=25, \n               fontsize=12, fontweight='bold')\ncbar.ax.tick_params(labelsize=10)\n\n# Add interpretive labels on colorbar\ncbar.ax.text(3.5, -0.9, 'Strong Negative', transform=cbar.ax.transData,\n            fontsize=9, fontweight='bold', color='#D73027', rotation=0)\ncbar.ax.text(3.5, 0.0, 'No Correlation', transform=cbar.ax.transData,\n            fontsize=9, fontweight='bold', color='#666666', rotation=0)\ncbar.ax.text(3.5, 0.9, 'Strong Positive', transform=cbar.ax.transData,\n            fontsize=9, fontweight='bold', color='#006D2C', rotation=0)\n\n# Title with significance legend\ntitle_text = 'Complete Correlation Matrix: All Target Variables\\n'\ntitle_text += 'Red = Negative | Yellow = Zero | Green = Positive  |  '\ntitle_text += '*** p<0.001, ** p<0.01, * p<0.05'\nax.set_title(title_text, fontsize=13, fontweight='bold', pad=20, color=COLORS['text'])\n\n# Grid\nax.set_xticks(np.arange(len(cfg.TARGET_COLS)) - 0.5, minor=True)\nax.set_yticks(np.arange(len(cfg.TARGET_COLS)) - 0.5, minor=True)\nax.grid(which='minor', color='white', linestyle='-', linewidth=2)\n\nplt.tight_layout()\nplt.savefig(cfg.OUTPUT_PATH / 'professional_2_correlation_matrix.png', dpi=300, bbox_inches='tight',\n            facecolor='white', edgecolor='none')\nprint(\"✓ Saved: professional_2_correlation_matrix.png\")\nplt.close()\n\n# ================================================================\n# 3. DETAILED BOX PLOTS WITH STATISTICS\n# ================================================================\n\nprint(\"\\n\" + \"=\"*80)\nprint(\"Creating Visualization 3: Detailed Box Plots\")\nprint(\"=\"*80)\n\nfig, ax = plt.subplots(figsize=(16, 8))\n\n# Prepare data\ndata_for_box = [train_pivot[col].dropna().values for col in cfg.TARGET_COLS]\nlabels = [cfg.TARGET_NAMES[col] for col in cfg.TARGET_COLS]\n\n# Create box plot\nbp = ax.boxplot(data_for_box, labels=labels, patch_artist=True,\n                widths=0.6, showmeans=True,\n                meanprops=dict(marker='D', markerfacecolor=COLORS['highlight'], \n                              markeredgecolor='white', markersize=10),\n                medianprops=dict(color=COLORS['secondary'], linewidth=2.5),\n                boxprops=dict(facecolor=COLORS['primary'], alpha=0.7, \n                             edgecolor=COLORS['text'], linewidth=1.5),\n                whiskerprops=dict(color=COLORS['text'], linewidth=1.5),\n                capprops=dict(color=COLORS['text'], linewidth=1.5),\n                flierprops=dict(marker='o', markerfacecolor=COLORS['highlight'], \n                               markersize=5, alpha=0.5, markeredgecolor='none'))\n\n# Add detailed statistics\nfor idx, (col, data) in enumerate(zip(cfg.TARGET_COLS, data_for_box)):\n    # Calculate statistics\n    q1 = np.percentile(data, 25)\n    median = np.median(data)\n    q3 = np.percentile(data, 75)\n    mean = np.mean(data)\n    iqr = q3 - q1\n    lower_whisker = q1 - 1.5 * iqr\n    upper_whisker = q3 + 1.5 * iqr\n    outliers = len(data[(data < lower_whisker) | (data > upper_whisker)])\n    \n    # Add text annotation\n    stats_text = f'Mean: {mean:.1f}g\\nMedian: {median:.1f}g\\nIQR: {iqr:.1f}g\\nOutliers: {outliers}'\n    ax.text(idx + 1, ax.get_ylim()[1] * 0.95, stats_text,\n            ha='center', va='top', fontsize=9,\n            bbox=dict(boxstyle='round', facecolor='white', alpha=0.9, \n                     edgecolor=COLORS['neutral']))\n\n# Labels and formatting\nax.set_ylabel('Biomass (grams)', fontsize=13, fontweight='bold')\nax.set_xlabel('Target Variables', fontsize=13, fontweight='bold')\nax.set_title('Box Plot Analysis: Target Variables with Statistical Details', \n             fontsize=15, fontweight='bold', pad=20, color=COLORS['text'])\n\n# Legend\nlegend_elements = [\n    plt.Line2D([0], [0], marker='D', color='w', label='Mean',\n              markerfacecolor=COLORS['highlight'], markersize=10),\n    plt.Line2D([0], [0], color=COLORS['secondary'], linewidth=2.5, label='Median'),\n    plt.Line2D([0], [0], marker='o', color='w', label='Outliers',\n              markerfacecolor=COLORS['highlight'], markersize=7, alpha=0.5)\n]\nax.legend(handles=legend_elements, loc='upper right', framealpha=0.95, \n         edgecolor=COLORS['neutral'], fontsize=11)\n\nax.grid(True, alpha=0.3, axis='y', linestyle='--')\nax.set_axisbelow(True)\nplt.xticks(rotation=15, ha='right')\n\nplt.tight_layout()\nplt.savefig(cfg.OUTPUT_PATH / 'professional_3_boxplots.png', dpi=300, bbox_inches='tight',\n            facecolor='white', edgecolor='none')\nprint(\"✓ Saved: professional_3_boxplots.png\")\nplt.close()\n\n# ================================================================\n# 4. SCATTER PLOT MATRIX WITH REGRESSION LINES\n# ================================================================\n\nprint(\"\\n\" + \"=\"*80)\nprint(\"Creating Visualization 4: Scatter Plot Matrix\")\nprint(\"=\"*80)\n\n# Select subset of targets for clarity\nmain_targets = ['Dry_Green_g', 'Dry_Dead_g', 'GDM_g', 'Dry_Total_g']\nn_targets = len(main_targets)\n\nfig, axes = plt.subplots(n_targets, n_targets, figsize=(18, 18))\n\nfor i, target1 in enumerate(main_targets):\n    for j, target2 in enumerate(main_targets):\n        ax = axes[i, j]\n        \n        if i == j:\n            # Diagonal: histogram with KDE\n            data = train_pivot[target1].dropna().values\n            ax.hist(data, bins=30, alpha=0.6, color=COLORS['primary'], \n                   edgecolor='white', density=True)\n            \n            # KDE\n            from scipy.stats import gaussian_kde\n            kde = gaussian_kde(data)\n            x_range = np.linspace(data.min(), data.max(), 100)\n            ax.plot(x_range, kde(x_range), color=COLORS['highlight'], \n                   linewidth=2.5, label='KDE')\n            \n            ax.set_ylabel('Density', fontsize=9)\n            if i == n_targets - 1:\n                ax.set_xlabel(cfg.TARGET_NAMES[target1], fontsize=10, fontweight='bold')\n        else:\n            # Off-diagonal: scatter plot\n            x_data = train_pivot[target2].dropna()\n            y_data = train_pivot[target1].dropna()\n            \n            # Align data\n            common_idx = x_data.index.intersection(y_data.index)\n            x_vals = x_data.loc[common_idx].values\n            y_vals = y_data.loc[common_idx].values\n            \n            # Scatter\n            ax.scatter(x_vals, y_vals, alpha=0.4, s=20, color=COLORS['primary'], \n                      edgecolors='none')\n            \n            # Regression line\n            if len(x_vals) > 1:\n                z = np.polyfit(x_vals, y_vals, 1)\n                p = np.poly1d(z)\n                x_line = np.linspace(x_vals.min(), x_vals.max(), 100)\n                ax.plot(x_line, p(x_line), color=COLORS['highlight'], \n                       linewidth=2.5, linestyle='--')\n                \n                # Correlation\n                r, p_val = pearsonr(x_vals, y_vals)\n                ax.text(0.05, 0.95, f'r={r:.3f}', transform=ax.transAxes,\n                       verticalalignment='top', fontsize=9, fontweight='bold',\n                       bbox=dict(boxstyle='round', facecolor='white', alpha=0.9))\n        \n        # Labels\n        if j == 0:\n            ax.set_ylabel(cfg.TARGET_NAMES[target1], fontsize=10, fontweight='bold')\n        if i == n_targets - 1:\n            ax.set_xlabel(cfg.TARGET_NAMES[target2], fontsize=10, fontweight='bold')\n        \n        ax.grid(True, alpha=0.2, linestyle='--')\n        ax.tick_params(labelsize=8)\n\nfig.suptitle('Scatter Plot Matrix: Pairwise Relationships Between Targets', \n             fontsize=16, fontweight='bold', y=0.995)\n\nplt.tight_layout()\nplt.savefig(cfg.OUTPUT_PATH / 'professional_4_scatter_matrix.png', dpi=300, bbox_inches='tight',\n            facecolor='white', edgecolor='none')\nprint(\"✓ Saved: professional_4_scatter_matrix.png\")\nplt.close()\n\n# ================================================================\n# 5. DETAILED SAMPLE IMAGE ANALYSIS\n# ================================================================\n\nprint(\"\\n\" + \"=\"*80)\nprint(\"Creating Visualization 5: Detailed Sample Image Analysis\")\nprint(\"=\"*80)\n\n# Select 6 sample images\nsample_images = train_pivot['image_path'].sample(min(6, len(train_pivot)), random_state=42).tolist()\n\nfig = plt.figure(figsize=(20, 16))\ngs = fig.add_gridspec(6, 4, hspace=0.35, wspace=0.3)  # 6 rows, 4 columns\n\nfor idx, img_path in enumerate(sample_images):\n    img_name = os.path.basename(img_path)\n    full_path = cfg.TRAIN_PATH / img_name\n    \n    img = cv2.imread(str(full_path))\n    if img is None:\n        continue\n    \n    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)\n    img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)\n    \n    # Main image (left column)\n    ax_img = fig.add_subplot(gs[idx, 0])\n    ax_img.imshow(img_rgb)\n    ax_img.set_title(f'Sample {idx+1}', fontsize=12, fontweight='bold')\n    ax_img.axis('off')\n    \n    # Add image properties\n    h, w, _ = img_rgb.shape\n    green_ratio = img_rgb[:,:,1] / (img_rgb.sum(axis=2) + 1)\n    brightness = img_rgb.mean()\n    \n    props_text = f'Size: {w}×{h}\\nBrightness: {brightness:.1f}\\nGreen Ratio: {green_ratio.mean():.3f}'\n    ax_img.text(0.02, 0.98, props_text, transform=ax_img.transAxes,\n               verticalalignment='top', fontsize=9,\n               bbox=dict(boxstyle='round', facecolor='white', alpha=0.9))\n    \n    # RGB histogram\n    ax_hist = fig.add_subplot(gs[idx, 1])\n    colors_rgb = ['#E74C3C', '#27AE60', '#3498DB']  # Red, Green, Blue\n    labels_rgb = ['Red', 'Green', 'Blue']\n    \n    for c, color, label in zip(range(3), colors_rgb, labels_rgb):\n        hist = cv2.calcHist([img_rgb], [c], None, [256], [0, 256])\n        ax_hist.plot(hist, color=color, linewidth=2, label=label, alpha=0.7)\n    \n    ax_hist.set_xlabel('Pixel Value', fontsize=9)\n    ax_hist.set_ylabel('Frequency', fontsize=9)\n    ax_hist.set_title('RGB Distribution', fontsize=10, fontweight='bold')\n    ax_hist.legend(fontsize=8)\n    ax_hist.grid(True, alpha=0.3)\n    ax_hist.set_xlim([0, 256])\n    \n    # Green channel analysis\n    ax_green = fig.add_subplot(gs[idx, 2])\n    green_channel = img_rgb[:,:,1]\n    ax_green.imshow(green_channel, cmap='Greens')\n    ax_green.set_title('Green Channel', fontsize=10, fontweight='bold')\n    ax_green.axis('off')\n    \n    # Vegetation index\n    ax_veg = fig.add_subplot(gs[idx, 3])\n    ax_veg.imshow(green_ratio, cmap='RdYlGn', vmin=0, vmax=0.5)\n    ax_veg.set_title('Vegetation Index', fontsize=10, fontweight='bold')\n    ax_veg.axis('off')\n\nfig.suptitle('Detailed Sample Image Analysis: RGB, Green Channel, and Vegetation Index', \n             fontsize=16, fontweight='bold', y=0.995)\n\nplt.savefig(cfg.OUTPUT_PATH / 'professional_5_sample_images.png', dpi=300, bbox_inches='tight',\n            facecolor='white', edgecolor='none')\nprint(\"✓ Saved: professional_5_sample_images.png\")\nplt.close()\n\n# ================================================================\n# 6. HIERARCHICAL RELATIONSHIP VALIDATION\n# ================================================================\n\nprint(\"\\n\" + \"=\"*80)\nprint(\"Creating Visualization 6: Hierarchical Relationships\")\nprint(\"=\"*80)\n\nfig, axes = plt.subplots(1, 2, figsize=(18, 7))\n\n# Green + Clover = GDM\nax = axes[0]\ncalculated = train_pivot['Dry_Green_g'] + train_pivot['Dry_Clover_g']\nactual = train_pivot['GDM_g']\n\nax.scatter(calculated, actual, alpha=0.5, s=40, color=COLORS['primary'], \n          edgecolors='white', linewidth=0.5)\n\n# Perfect match line\nmax_val = max(calculated.max(), actual.max())\nax.plot([0, max_val], [0, max_val], color=COLORS['highlight'], \n       linewidth=3, linestyle='--', label='Perfect Match (y=x)')\n\n# Regression line\nz = np.polyfit(calculated, actual, 1)\np = np.poly1d(z)\nx_line = np.linspace(calculated.min(), calculated.max(), 100)\nax.plot(x_line, p(x_line), color=COLORS['secondary'], \n       linewidth=2.5, label=f'Regression: y={z[0]:.3f}x+{z[1]:.2f}')\n\n# Statistics\nr, p_val = pearsonr(calculated, actual)\nrmse = np.sqrt(((calculated - actual) ** 2).mean())\n\nstats_text = f'Pearson r: {r:.4f}\\np-value: {p_val:.2e}\\nRMSE: {rmse:.2f}g\\nn: {len(calculated):,}'\nax.text(0.05, 0.95, stats_text, transform=ax.transAxes,\n       verticalalignment='top', fontsize=11, fontweight='bold',\n       bbox=dict(boxstyle='round', facecolor='white', alpha=0.95, \n                edgecolor=COLORS['neutral'], linewidth=2))\n\nax.set_xlabel('Green + Clover (calculated, grams)', fontsize=12, fontweight='bold')\nax.set_ylabel('GDM (actual, grams)', fontsize=12, fontweight='bold')\nax.set_title('Hierarchical Validation: Green + Clover = GDM', \n            fontsize=13, fontweight='bold', pad=15)\nax.legend(loc='lower right', fontsize=11, framealpha=0.95)\nax.grid(True, alpha=0.3, linestyle='--')\n\n# GDM + Dead = Total\nax = axes[1]\ncalculated = train_pivot['GDM_g'] + train_pivot['Dry_Dead_g']\nactual = train_pivot['Dry_Total_g']\n\nax.scatter(calculated, actual, alpha=0.5, s=40, color=COLORS['primary'], \n          edgecolors='white', linewidth=0.5)\n\nmax_val = max(calculated.max(), actual.max())\nax.plot([0, max_val], [0, max_val], color=COLORS['highlight'], \n       linewidth=3, linestyle='--', label='Perfect Match (y=x)')\n\nz = np.polyfit(calculated, actual, 1)\np = np.poly1d(z)\nx_line = np.linspace(calculated.min(), calculated.max(), 100)\nax.plot(x_line, p(x_line), color=COLORS['secondary'], \n       linewidth=2.5, label=f'Regression: y={z[0]:.3f}x+{z[1]:.2f}')\n\nr, p_val = pearsonr(calculated, actual)\nrmse = np.sqrt(((calculated - actual) ** 2).mean())\n\nstats_text = f'Pearson r: {r:.4f}\\np-value: {p_val:.2e}\\nRMSE: {rmse:.2f}g\\nn: {len(calculated):,}'\nax.text(0.05, 0.95, stats_text, transform=ax.transAxes,\n       verticalalignment='top', fontsize=11, fontweight='bold',\n       bbox=dict(boxstyle='round', facecolor='white', alpha=0.95, \n                edgecolor=COLORS['neutral'], linewidth=2))\n\nax.set_xlabel('GDM + Dead (calculated, grams)', fontsize=12, fontweight='bold')\nax.set_ylabel('Total Biomass (actual, grams)', fontsize=12, fontweight='bold')\nax.set_title('Hierarchical Validation: GDM + Dead = Total', \n            fontsize=13, fontweight='bold', pad=15)\nax.legend(loc='lower right', fontsize=11, framealpha=0.95)\nax.grid(True, alpha=0.3, linestyle='--')\n\nfig.suptitle('Hierarchical Relationship Validation with Statistical Analysis', \n             fontsize=15, fontweight='bold', y=1.00)\n\nplt.tight_layout()\nplt.savefig(cfg.OUTPUT_PATH / 'professional_6_hierarchical.png', dpi=300, bbox_inches='tight',\n            facecolor='white', edgecolor='none')\nprint(\"✓ Saved: professional_6_hierarchical.png\")\nplt.close()\n\n# ================================================================\n# SUMMARY\n# ================================================================\n\nprint(\"\\n\" + \"=\"*80)\nprint(\"EDA COMPLETE - ALL VISUALIZATIONS SAVED\")\nprint(\"=\"*80)\nprint(\"\\nGenerated Professional Visualizations:\")\nprint(\"  1. professional_1_distributions.png - Target distributions with bell curves\")\nprint(\"  2. professional_2_correlation_matrix.png - Complete correlation analysis\")\nprint(\"  3. professional_3_boxplots.png - Detailed box plots with statistics\")\nprint(\"  4. professional_4_scatter_matrix.png - Scatter plot matrix with regression\")\nprint(\"  5. professional_5_sample_images.png - Detailed image analysis\")\nprint(\"  6. professional_6_hierarchical.png - Hierarchical relationship validation\")\nprint(\"\\nAll visualizations use consistent professional color scheme\")\nprint(\"Statistical details and annotations included on all plots\")\nprint(\"=\"*80)","metadata":{"_uuid":"eba9ea1a-132a-4d3b-b627-956bdfcf899c","_cell_guid":"9a182e42-6a25-4449-b40b-efcfd297fe51","trusted":true,"collapsed":false,"execution":{"iopub.status.busy":"2025-12-28T20:01:03.101898Z","iopub.execute_input":"2025-12-28T20:01:03.102209Z","iopub.status.idle":"2025-12-28T20:01:28.468116Z","shell.execute_reply.started":"2025-12-28T20:01:03.102187Z","shell.execute_reply":"2025-12-28T20:01:28.467403Z"},"jupyter":{"outputs_hidden":false}},"outputs":[{"name":"stdout","text":"================================================================================\nCSIRO BIOMASS COMPETITION - PROFESSIONAL EDA\n================================================================================\n\nLoading data...\nTrain shape: (1785, 9)\nTest shape: (5, 3)\nPivoted train shape: (357, 6)\n\n================================================================================\nCreating Visualization 1: Target Distributions with Normal Curves\n================================================================================\n✓ Saved: professional_1_distributions.png\n\n================================================================================\nCreating Visualization 2: Complete Correlation Matrix\n================================================================================\n✓ Saved: professional_2_correlation_matrix.png\n\n================================================================================\nCreating Visualization 3: Detailed Box Plots\n================================================================================\n✓ Saved: professional_3_boxplots.png\n\n================================================================================\nCreating Visualization 4: Scatter Plot Matrix\n================================================================================\n✓ Saved: professional_4_scatter_matrix.png\n\n================================================================================\nCreating Visualization 5: Detailed Sample Image Analysis\n================================================================================\n✓ Saved: professional_5_sample_images.png\n\n================================================================================\nCreating Visualization 6: Hierarchical Relationships\n================================================================================\n✓ Saved: professional_6_hierarchical.png\n\n================================================================================\nEDA COMPLETE - ALL VISUALIZATIONS SAVED\n================================================================================\n\nGenerated Professional Visualizations:\n  1. professional_1_distributions.png - Target distributions with bell curves\n  2. professional_2_correlation_matrix.png - Complete correlation analysis\n  3. professional_3_boxplots.png - Detailed box plots with statistics\n  4. professional_4_scatter_matrix.png - Scatter plot matrix with regression\n  5. professional_5_sample_images.png - Detailed image analysis\n  6. professional_6_hierarchical.png - Hierarchical relationship validation\n\nAll visualizations use consistent professional color scheme\nStatistical details and annotations included on all plots\n================================================================================\n","output_type":"stream"}],"execution_count":2},{"cell_type":"code","source":"# ================================================================\n# CSIRO BIOMASS - NO PCA VERSION (BEST PERFORMANCE)\n# ================================================================\n# Target: 0.70+ CV Score in 15-20 minutes\n# NO PCA - use all features directly!\n# ================================================================\n\nimport os\nimport gc\nimport numpy as np\nimport pandas as pd\nimport cv2\nfrom pathlib import Path\nfrom tqdm.auto import tqdm\nimport warnings\nwarnings.filterwarnings('ignore')\n\nfrom sklearn.model_selection import KFold\nfrom sklearn.preprocessing import StandardScaler\nfrom lightgbm import LGBMRegressor\nfrom catboost import CatBoostRegressor\nfrom xgboost import XGBRegressor\nfrom sklearn.ensemble import VotingRegressor\n\n# ================================================================\n# Configuration\n# ================================================================\n\nclass Config:\n    BASE_PATH = Path(\"/kaggle/input/csiro-biomass/\")\n    TRAIN_PATH = BASE_PATH / \"train\"\n    TEST_PATH = BASE_PATH / \"test\"\n    \n    SEED = 42\n    N_FOLDS = 5\n    \n    TARGET_COLS = ['Dry_Green_g', 'Dry_Dead_g', 'Dry_Clover_g', 'GDM_g', 'Dry_Total_g']\n    TARGET_WEIGHTS = {\n        'Dry_Green_g': 0.1,\n        'Dry_Dead_g': 0.1,\n        'Dry_Clover_g': 0.1,\n        'GDM_g': 0.2,\n        'Dry_Total_g': 0.5,\n    }\n\ncfg = Config()\n\n# ================================================================\n# Utility Functions\n# ================================================================\n\ndef set_seed(seed=42):\n    np.random.seed(seed)\n    import random\n    random.seed(seed)\n    os.environ['PYTHONHASHSEED'] = str(seed)\n\ndef competition_metric(y_true, y_pred):\n    \"\"\"Competition metric - weighted R²\"\"\"\n    weights = np.array([cfg.TARGET_WEIGHTS[col] for col in cfg.TARGET_COLS])\n    y_weighted = np.sum(y_true.mean(axis=0) * weights)\n    ss_res = np.sum(((y_true - y_pred) ** 2).mean(axis=0) * weights)\n    ss_tot = np.sum(((y_true - y_weighted) ** 2).mean(axis=0) * weights)\n    return 1 - ss_res / ss_tot\n\ndef reconcile_predictions(df):\n    \"\"\"Apply hierarchical reconciliation\"\"\"\n    df = df.copy()\n    for col in cfg.TARGET_COLS:\n        df[col] = df[col].clip(lower=0)\n    \n    ordered_cols = [\"Dry_Green_g\", \"Dry_Clover_g\", \"Dry_Dead_g\", \"GDM_g\", \"Dry_Total_g\"]\n    Y = df[ordered_cols].values.T\n    \n    C = np.array([[1, 1, 0, -1, 0], [0, 0, 1, 1, -1]])\n    C_T = C.T\n    inv_CCt = np.linalg.inv(C @ C_T)\n    P = np.eye(5) - C_T @ inv_CCt @ C\n    Y_reconciled = P @ Y\n    Y_reconciled = Y_reconciled.T.clip(min=0)\n    \n    df[ordered_cols] = Y_reconciled\n    return df\n\n# ================================================================\n# HIGH-QUALITY Feature Extraction (160 features)\n# ================================================================\n\ndef extract_quality_features(image_path):\n    \"\"\"Extract 160 high-quality features\"\"\"\n    img = cv2.imread(str(image_path))\n    if img is None:\n        return np.zeros(160)\n    \n    # Good balance: 1400×700\n    img = cv2.resize(img, (1400, 700), interpolation=cv2.INTER_LINEAR)\n    \n    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)\n    img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)\n    img_lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)\n    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)\n    \n    h, w, _ = img_rgb.shape\n    \n    features = []\n    \n    # 1. RGB Statistics (27 features)\n    for channel in range(3):\n        ch = img_rgb[:, :, channel]\n        features.extend([\n            ch.mean(), ch.std(), ch.var(),\n            np.percentile(ch, 10), np.percentile(ch, 25),\n            np.percentile(ch, 75), np.percentile(ch, 90),\n            ch.max(), ch.min()\n        ])\n    \n    # 2. HSV Statistics (27 features)\n    for channel in range(3):\n        ch = img_hsv[:, :, channel]\n        features.extend([\n            ch.mean(), ch.std(), ch.var(),\n            np.percentile(ch, 10), np.percentile(ch, 25),\n            np.percentile(ch, 75), np.percentile(ch, 90),\n            ch.max(), ch.min()\n        ])\n    \n    # 3. LAB Statistics (27 features)\n    for channel in range(3):\n        ch = img_lab[:, :, channel]\n        features.extend([\n            ch.mean(), ch.std(), ch.var(),\n            np.percentile(ch, 10), np.percentile(ch, 25),\n            np.percentile(ch, 75), np.percentile(ch, 90),\n            ch.max(), ch.min()\n        ])\n    \n    # 4. Vegetation Indices (24 features)\n    R = img_rgb[:, :, 0].astype(float) + 1\n    G = img_rgb[:, :, 1].astype(float) + 1\n    B = img_rgb[:, :, 2].astype(float) + 1\n    \n    green_ratio = G / (R + G + B)\n    ExG = 2 * G - R - B\n    ExR = 1.4 * R - G\n    GRVI = (G - R) / (G + R)\n    VARI = (G - R) / (G + R - B + 1e-6)\n    NGBDI = (G - B) / (G + B + 1e-6)\n    CIVE = 0.441 * R - 0.811 * G + 0.385 * B\n    VEG = G / (R ** 0.667 * B ** 0.333 + 1e-6)\n    \n    for idx in [green_ratio, ExG, ExR, GRVI, VARI, NGBDI, CIVE, VEG]:\n        features.extend([idx.mean(), idx.std(), np.percentile(idx, 75)])\n    \n    # 5. Texture (18 features)\n    features.extend([\n        img_gray.mean(), img_gray.std(), img_gray.var(),\n        np.percentile(img_gray, 10), np.percentile(img_gray, 25),\n        np.percentile(img_gray, 75), np.percentile(img_gray, 90),\n        img_gray.max(), img_gray.min()\n    ])\n    \n    grad_x = np.abs(np.diff(img_gray, axis=1)).mean()\n    grad_y = np.abs(np.diff(img_gray, axis=0)).mean()\n    features.extend([\n        grad_x, grad_y, grad_x + grad_y,\n        grad_x / (grad_y + 1e-6),\n        np.abs(grad_x - grad_y),\n        (grad_x > grad_x.mean()).sum() / img_gray.size,\n        (grad_y > grad_y.mean()).sum() / img_gray.size\n    ])\n    \n    edges = cv2.Canny(img_gray, 50, 150)\n    features.extend([\n        edges.mean(),\n        np.count_nonzero(edges) / edges.size\n    ])\n    \n    # 6. Spatial (18 features)\n    mid = w // 2\n    left = img_rgb[:, :mid]\n    right = img_rgb[:, mid:]\n    \n    for channel in range(3):\n        features.extend([\n            left[:, :, channel].mean() - right[:, :, channel].mean(),\n            left[:, :, channel].std() - right[:, :, channel].std()\n        ])\n    \n    h_mid = h // 2\n    quads = [\n        img_rgb[:h_mid, :mid, 1],\n        img_rgb[:h_mid, mid:, 1],\n        img_rgb[h_mid:, :mid, 1],\n        img_rgb[h_mid:, mid:, 1]\n    ]\n    \n    for quad in quads:\n        features.extend([quad.mean(), quad.std()])\n    \n    features.extend([\n        img_rgb[:h//3, :, 1].mean(),\n        img_rgb[h//3:2*h//3, :, 1].mean(),\n        img_rgb[2*h//3:, :, 1].mean(),\n        img_rgb[:h//2, :, 1].mean() - img_rgb[h//2:, :, 1].mean()\n    ])\n    \n    # 7. Saturation & Brightness (10 features)\n    saturation = img_hsv[:, :, 1]\n    value = img_hsv[:, :, 2]\n    \n    features.extend([\n        saturation.mean(), saturation.std(),\n        (saturation > 50).mean(), (saturation > 100).mean(),\n        np.percentile(saturation, 75)\n    ])\n    \n    features.extend([\n        value.mean(), value.std(),\n        (value > 128).mean(),\n        np.percentile(value, 75),\n        (value < 50).mean()\n    ])\n    \n    # 8. Color Ratios (9 features)\n    features.extend([\n        (G / R).mean(), (G / B).mean(), (R / B).mean(),\n        (G > R).mean(), (G > B).mean(), (R > B).mean(),\n        (G - R).mean(), (G - B).mean(), (R - B).mean()\n    ])\n    \n    return np.array(features)\n\ndef load_or_create_features(df, image_dir, feature_cache_path=None):\n    \"\"\"Load or create features\"\"\"\n    if feature_cache_path and os.path.exists(feature_cache_path):\n        print(f\"Loading cached features from {feature_cache_path}\")\n        return pd.read_parquet(feature_cache_path)\n    \n    print(\"Extracting quality features (160 features)...\")\n    features_list = []\n    image_paths = []\n    \n    for idx in tqdm(range(len(df)), desc=\"Processing images\"):\n        row = df.iloc[idx]\n        img_path_value = row['image_path']\n        img_name = os.path.basename(str(img_path_value))\n        img_path = image_dir / img_name\n        \n        try:\n            features = extract_quality_features(img_path)\n        except Exception as e:\n            features = np.zeros(160)\n        \n        features_list.append(features)\n        image_paths.append(img_path_value)\n    \n    feature_cols = [f'feat_{i}' for i in range(160)]\n    feature_df = pd.DataFrame(features_list, columns=feature_cols)\n    feature_df['image_path'] = image_paths\n    \n    for col in cfg.TARGET_COLS:\n        if col in df.columns:\n            feature_df[col] = df[col].values\n    \n    if feature_cache_path:\n        feature_df.to_parquet(feature_cache_path, index=False)\n        print(f\"Cached features to {feature_cache_path}\")\n    \n    return feature_df\n\n# ================================================================\n# POWERFUL Model - NO PCA!\n# ================================================================\n\ndef create_no_pca_model(target_name):\n    \"\"\"Create powerful model - works on raw features\"\"\"\n    \n    is_total = (target_name == 'Dry_Total_g')\n    \n    lgb = LGBMRegressor(\n        n_estimators=1200 if is_total else 1000,\n        learning_rate=0.02,\n        max_depth=10,\n        num_leaves=200,\n        min_child_samples=8,\n        subsample=0.85,\n        colsample_bytree=0.85,\n        reg_alpha=0.05,\n        reg_lambda=0.05,\n        random_state=cfg.SEED,\n        verbose=-1,\n        n_jobs=-1\n    )\n    \n    xgb = XGBRegressor(\n        n_estimators=1200 if is_total else 1000,\n        learning_rate=0.02,\n        max_depth=10,\n        min_child_weight=2,\n        subsample=0.85,\n        colsample_bytree=0.85,\n        reg_alpha=0.05,\n        reg_lambda=0.05,\n        random_state=cfg.SEED,\n        n_jobs=-1,\n        tree_method='hist'\n    )\n    \n    cat = CatBoostRegressor(\n        iterations=1200 if is_total else 1000,\n        learning_rate=0.02,\n        depth=9,\n        l2_leaf_reg=3,\n        random_state=cfg.SEED,\n        verbose=0,\n        thread_count=-1\n    )\n    \n    model = VotingRegressor([\n        ('lgb', lgb),\n        ('xgb', xgb),\n        ('cat', cat)\n    ])\n    \n    return model\n\ndef train_no_pca_model(train_df, feature_cols):\n    \"\"\"Train model WITHOUT PCA\"\"\"\n    \n    set_seed(cfg.SEED)\n    kfold = KFold(n_splits=cfg.N_FOLDS, shuffle=True, random_state=cfg.SEED)\n    \n    X_df = train_df[feature_cols].copy()\n    \n    # Simple standardization - NO PCA!\n    scaler = StandardScaler()\n    X_scaled_array = scaler.fit_transform(X_df)\n    X_scaled = pd.DataFrame(X_scaled_array, columns=X_df.columns, index=X_df.index)\n    \n    print(f\"Training on ALL {len(feature_cols)} features (NO PCA compression)\")\n    \n    oof_predictions = np.zeros((len(train_df), len(cfg.TARGET_COLS)))\n    models = []\n    \n    for fold, (train_idx, val_idx) in enumerate(kfold.split(train_df)):\n        print(f\"\\n{'='*60}\")\n        print(f\"Fold {fold + 1}/{cfg.N_FOLDS}\")\n        print(f\"{'='*60}\")\n        \n        X_train = X_scaled.iloc[train_idx]\n        X_val = X_scaled.iloc[val_idx]\n        \n        fold_models = []\n        \n        for target_idx, target_col in enumerate(cfg.TARGET_COLS):\n            y_train = train_df.iloc[train_idx][target_col].values\n            y_val = train_df.iloc[val_idx][target_col].values\n            \n            model = create_no_pca_model(target_col)\n            model.fit(X_train, y_train)\n            \n            pred = model.predict(X_val)\n            pred = np.clip(pred, 0, None)\n            \n            oof_predictions[val_idx, target_idx] = pred\n            fold_models.append(model)\n            \n            ss_res = ((y_val - pred) ** 2).mean()\n            ss_tot = ((y_val - y_val.mean()) ** 2).mean()\n            r2 = 1 - ss_res / ss_tot\n            marker = \" ⭐ (50%!)\" if target_col == 'Dry_Total_g' else \"\"\n            print(f\"  {target_col}: R² = {r2:.4f}{marker}\")\n        \n        models.append(fold_models)\n        \n        fold_score = competition_metric(\n            train_df.iloc[val_idx][cfg.TARGET_COLS].values,\n            oof_predictions[val_idx]\n        )\n        print(f\"\\nFold {fold + 1} Score: {fold_score:.4f}\")\n    \n    cv_score = competition_metric(\n        train_df[cfg.TARGET_COLS].values,\n        oof_predictions\n    )\n    \n    print(f\"\\n{'='*60}\")\n    print(f\"Overall CV Score: {cv_score:.4f}\")\n    print(f\"{'='*60}\")\n    \n    return models, scaler, oof_predictions\n\ndef predict_no_pca(test_df, models, scaler, feature_cols):\n    \"\"\"Predict WITHOUT PCA\"\"\"\n    \n    print(\"\\nGenerating predictions...\")\n    \n    X_test_df = test_df[feature_cols].copy()\n    X_test_scaled_array = scaler.transform(X_test_df)\n    X_test_scaled = pd.DataFrame(X_test_scaled_array, columns=X_test_df.columns, index=X_test_df.index)\n    \n    predictions = np.zeros((len(test_df), len(cfg.TARGET_COLS)))\n    \n    for fold_idx, fold_models in enumerate(models):\n        for target_idx, model in enumerate(fold_models):\n            pred = model.predict(X_test_scaled)\n            pred = np.clip(pred, 0, None)\n            predictions[:, target_idx] += pred\n    \n    predictions /= len(models)\n    \n    return predictions\n\n# ================================================================\n# Main\n# ================================================================\n\ndef main():\n    print(\"=\"*60)\n    print(\"CSIRO BIOMASS - NO PCA VERSION\")\n    print(\"Target: 0.70+ CV Score\")\n    print(\"=\"*60)\n    \n    set_seed(cfg.SEED)\n    \n    print(\"\\n1. Loading data...\")\n    train_df = pd.read_csv(cfg.BASE_PATH / \"train.csv\")\n    test_df = pd.read_csv(cfg.BASE_PATH / \"test.csv\")\n    \n    print(\"\\n2. Pivoting data...\")\n    train_pivot = train_df.pivot_table(\n        values='target',\n        index='image_path',\n        columns='target_name',\n        aggfunc='mean'\n    ).reset_index()\n    \n    for col in cfg.TARGET_COLS:\n        if col in train_pivot.columns:\n            train_pivot[col] = pd.to_numeric(train_pivot[col], errors='coerce').fillna(0.0)\n    \n    train_pivot['image_path'] = train_pivot['image_path'].apply(\n        lambda x: os.path.basename(x) if isinstance(x, str) else x\n    )\n    \n    test_unique = test_df.drop_duplicates('image_path').reset_index(drop=True)\n    test_unique['image_path'] = test_unique['image_path'].apply(\n        lambda x: os.path.basename(x) if isinstance(x, str) else x\n    )\n    \n    print(\"\\n3. Extracting features...\")\n    train_features = load_or_create_features(\n        train_pivot,\n        cfg.TRAIN_PATH,\n        feature_cache_path='/kaggle/working/train_features_no_pca.parquet'\n    )\n    \n    test_features = load_or_create_features(\n        test_unique,\n        cfg.TEST_PATH,\n        feature_cache_path='/kaggle/working/test_features_no_pca.parquet'\n    )\n    \n    feature_cols = [col for col in train_features.columns if col.startswith('feat_')]\n    print(f\"Features: {len(feature_cols)}\")\n    \n    print(\"\\n4. Training (NO PCA - using all features!)...\")\n    models, scaler, oof_preds = train_no_pca_model(train_features, feature_cols)\n    \n    print(\"\\n5. Reconciling...\")\n    oof_df = pd.DataFrame(oof_preds, columns=cfg.TARGET_COLS)\n    oof_reconciled = reconcile_predictions(oof_df)\n    \n    reconciled_score = competition_metric(\n        train_features[cfg.TARGET_COLS].values,\n        oof_reconciled.values\n    )\n    print(f\"Reconciled CV Score: {reconciled_score:.4f}\")\n    \n    print(\"\\n6. Predicting on test...\")\n    test_preds = predict_no_pca(test_features, models, scaler, feature_cols)\n    \n    print(\"\\n7. Creating submission...\")\n    pred_df = pd.DataFrame(test_preds, columns=cfg.TARGET_COLS)\n    pred_df['image_path'] = test_features['image_path'].values\n    pred_df = reconcile_predictions(pred_df)\n    \n    pred_long = pred_df.melt(\n        id_vars='image_path',\n        value_vars=cfg.TARGET_COLS,\n        var_name='target_name',\n        value_name='target'\n    )\n    \n    test_df['image_path_basename'] = test_df['image_path'].apply(\n        lambda x: os.path.basename(x) if isinstance(x, str) else x\n    )\n    pred_long['image_path_basename'] = pred_long['image_path'].apply(\n        lambda x: os.path.basename(x) if isinstance(x, str) else x\n    )\n    \n    submission = test_df[['sample_id', 'image_path_basename', 'target_name']].merge(\n        pred_long[['image_path_basename', 'target_name', 'target']],\n        on=['image_path_basename', 'target_name'],\n        how='left'\n    )[['sample_id', 'target']]\n    \n    submission.to_csv('/kaggle/working/submission.csv', index=False)\n    \n    print(\"\\n\" + \"=\"*60)\n    print(\"✓ NO PCA VERSION COMPLETE!\")\n    print(\"=\"*60)\n    print(f\"\\nFinal CV Score: {reconciled_score:.4f}\")\n    print(\"Key: NO PCA compression - used all 160 features!\")\n\nif __name__ == \"__main__\":\n    main()","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-28T20:01:28.469198Z","iopub.execute_input":"2025-12-28T20:01:28.469509Z","iopub.status.idle":"2025-12-28T20:44:11.971691Z","shell.execute_reply.started":"2025-12-28T20:01:28.469476Z","shell.execute_reply":"2025-12-28T20:44:11.971022Z"}},"outputs":[{"name":"stdout","text":"============================================================\nCSIRO BIOMASS - NO PCA VERSION\nTarget: 0.70+ CV Score\n============================================================\n\n1. Loading data...\n\n2. Pivoting data...\n\n3. Extracting features...\nExtracting quality features (160 features)...\n","output_type":"stream"},{"output_type":"display_data","data":{"text/plain":"Processing images:   0%|          | 0/357 [00:00<?, ?it/s]","application/vnd.jupyter.widget-view+json":{"version_major":2,"version_minor":0,"model_id":"1f7c4f41e2884d3ab6f3bdbf540a2099"}},"metadata":{}},{"name":"stdout","text":"Cached features to /kaggle/working/train_features_no_pca.parquet\nExtracting quality features (160 features)...\n","output_type":"stream"},{"output_type":"display_data","data":{"text/plain":"Processing images:   0%|          | 0/1 [00:00<?, ?it/s]","application/vnd.jupyter.widget-view+json":{"version_major":2,"version_minor":0,"model_id":"a19269e221fe4f88beb3bfc5dc09a653"}},"metadata":{}},{"name":"stdout","text":"Cached features to /kaggle/working/test_features_no_pca.parquet\nFeatures: 160\n\n4. Training (NO PCA - using all features!)...\nTraining on ALL 160 features (NO PCA compression)\n\n============================================================\nFold 1/5\n============================================================\n  Dry_Green_g: R² = 0.3206\n  Dry_Dead_g: R² = 0.3436\n  Dry_Clover_g: R² = 0.0790\n  GDM_g: R² = 0.4860\n  Dry_Total_g: R² = 0.4390 ⭐ (50%!)\n\nFold 1 Score: 0.5754\n\n============================================================\nFold 2/5\n============================================================\n  Dry_Green_g: R² = 0.4169\n  Dry_Dead_g: R² = 0.3750\n  Dry_Clover_g: R² = 0.3419\n  GDM_g: R² = 0.3049\n  Dry_Total_g: R² = 0.3708 ⭐ (50%!)\n\nFold 2 Score: 0.5039\n\n============================================================\nFold 3/5\n============================================================\n  Dry_Green_g: R² = 0.3275\n  Dry_Dead_g: R² = 0.2084\n  Dry_Clover_g: R² = 0.1084\n  GDM_g: R² = 0.4871\n  Dry_Total_g: R² = 0.4894 ⭐ (50%!)\n\nFold 3 Score: 0.5845\n\n============================================================\nFold 4/5\n============================================================\n  Dry_Green_g: R² = 0.5412\n  Dry_Dead_g: R² = 0.3131\n  Dry_Clover_g: R² = 0.4706\n  GDM_g: R² = 0.6428\n  Dry_Total_g: R² = 0.5507 ⭐ (50%!)\n\nFold 4 Score: 0.6692\n\n============================================================\nFold 5/5\n============================================================\n  Dry_Green_g: R² = 0.4128\n  Dry_Dead_g: R² = 0.4047\n  Dry_Clover_g: R² = 0.2544\n  GDM_g: R² = 0.4280\n  Dry_Total_g: R² = 0.3501 ⭐ (50%!)\n\nFold 5 Score: 0.5281\n\n============================================================\nOverall CV Score: 0.5701\n============================================================\n\n5. Reconciling...\nReconciled CV Score: 0.5743\n\n6. Predicting on test...\n\nGenerating predictions...\n\n7. Creating submission...\n\n============================================================\n✓ NO PCA VERSION COMPLETE!\n============================================================\n\nFinal CV Score: 0.5743\nKey: NO PCA compression - used all 160 features!\n","output_type":"stream"}],"execution_count":3}]}
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2025-12-30T17:45:28.708726Z","iopub.execute_input":"2025-12-30T17:45:28.709111Z","iopub.status.idle":"2025-12-30T17:45:29.832440Z","shell.execute_reply.started":"2025-12-30T17:45:28.709076Z","shell.execute_reply":"2025-12-30T17:45:29.831591Z"}}
+# This Python 3 environment comes with many helpful analytics libraries installed
+# It is defined by the kaggle/python Docker image: https://github.com/kaggle/docker-python
+# For example, here's several helpful packages to load
+
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+
+# Input data files are available in the read-only "../input/" directory
+# For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory
+
+import os
+for dirname, _, filenames in os.walk('/kaggle/input'):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+
+# You can write up to 20GB to the current directory (/kaggle/working/) that gets preserved as output when you create a version using "Save & Run All" 
+# You can also write temporary files to /kaggle/temp/, but they won't be saved outside of the current session
+
+# %% [code] {"execution":{"iopub.status.busy":"2025-12-30T17:45:29.834079Z","iopub.execute_input":"2025-12-30T17:45:29.834429Z","iopub.status.idle":"2025-12-30T17:45:54.764929Z","shell.execute_reply.started":"2025-12-30T17:45:29.834406Z","shell.execute_reply":"2025-12-30T17:45:54.764219Z"},"jupyter":{"outputs_hidden":false}}
+# ================================================================
+# CSIRO BIOMASS COMPETITION - PROFESSIONAL EDA
+# ================================================================
+# Professional visualizations with consistent color scheme
+# Complete statistical analysis with bell curves and annotations
+# ================================================================
+
+import os
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import cv2
+from PIL import Image
+from pathlib import Path
+from tqdm.auto import tqdm
+import warnings
+warnings.filterwarnings('ignore')
+
+from scipy import stats
+from scipy.stats import skew, kurtosis, normaltest, pearsonr, spearmanr, norm
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
+# ================================================================
+# PROFESSIONAL STYLING CONFIGURATION
+# ================================================================
+
+# Professional color palette (consistent across all plots)
+COLORS = {
+    'primary': '#2E4057',      # Dark blue-gray (main)
+    'secondary': '#048A81',     # Teal (accent)
+    'tertiary': '#54C6EB',      # Light blue
+    'highlight': '#D95D39',     # Coral red (emphasis)
+    'neutral': '#8B8B8B',       # Gray
+    'background': '#F5F5F5',    # Light gray background
+    'grid': '#E0E0E0',          # Grid color
+    'text': '#2C3E50'           # Dark text
+}
+
+# Set professional matplotlib style
+plt.style.use('seaborn-v0_8-whitegrid')
+plt.rcParams.update({
+    'figure.figsize': (12, 7),
+    'font.size': 11,
+    'axes.labelsize': 12,
+    'axes.titlesize': 14,
+    'xtick.labelsize': 10,
+    'ytick.labelsize': 10,
+    'legend.fontsize': 10,
+    'figure.titlesize': 16,
+    'axes.facecolor': COLORS['background'],
+    'figure.facecolor': 'white',
+    'axes.edgecolor': COLORS['neutral'],
+    'grid.color': COLORS['grid'],
+    'grid.alpha': 0.3,
+    'text.color': COLORS['text'],
+    'axes.labelcolor': COLORS['text'],
+    'xtick.color': COLORS['text'],
+    'ytick.color': COLORS['text']
+})
+
+# ================================================================
+# CONFIGURATION
+# ================================================================
+
+class Config:
+    BASE_PATH = Path("/kaggle/input/csiro-biomass/")
+    TRAIN_PATH = BASE_PATH / "train"
+    TEST_PATH = BASE_PATH / "test"
+    OUTPUT_PATH = Path("/kaggle/working/")
+    
+    TARGET_COLS = ['Dry_Green_g', 'Dry_Dead_g', 'Dry_Clover_g', 'GDM_g', 'Dry_Total_g']
+    TARGET_NAMES = {
+        'Dry_Green_g': 'Green Biomass',
+        'Dry_Dead_g': 'Dead Biomass',
+        'Dry_Clover_g': 'Clover Biomass',
+        'GDM_g': 'Green Dry Matter',
+        'Dry_Total_g': 'Total Biomass'
+    }
+    
+    TARGET_WEIGHTS = {
+        'Dry_Green_g': 0.1,
+        'Dry_Dead_g': 0.1,
+        'Dry_Clover_g': 0.1,
+        'GDM_g': 0.2,
+        'Dry_Total_g': 0.5,
+    }
+
+cfg = Config()
+
+print("="*80)
+print("CSIRO BIOMASS COMPETITION - PROFESSIONAL EDA")
+print("="*80)
+
+# ================================================================
+# LOAD DATA
+# ================================================================
+
+print("\nLoading data...")
+train_df = pd.read_csv(cfg.BASE_PATH / "train.csv")
+test_df = pd.read_csv(cfg.BASE_PATH / "test.csv")
+
+print(f"Train shape: {train_df.shape}")
+print(f"Test shape: {test_df.shape}")
+
+# Pivot to get one row per image
+train_pivot = train_df.pivot_table(
+    values='target',
+    index='image_path',
+    columns='target_name',
+    aggfunc='mean'
+).reset_index()
+
+print(f"Pivoted train shape: {train_pivot.shape}")
+
+# ================================================================
+# 1. COMPREHENSIVE TARGET DISTRIBUTION WITH BELL CURVES
+# ================================================================
+
+print("\n" + "="*80)
+print("Creating Visualization 1: Target Distributions with Normal Curves")
+print("="*80)
+
+fig = plt.figure(figsize=(20, 12))
+gs = fig.add_gridspec(3, 2, hspace=0.3, wspace=0.25)
+
+for idx, col in enumerate(cfg.TARGET_COLS):
+    row = idx // 2
+    col_idx = idx % 2
+    ax = fig.add_subplot(gs[row, col_idx])
+    
+    values = train_pivot[col].dropna().values
+    
+    # Histogram
+    n, bins, patches = ax.hist(values, bins=40, alpha=0.6, color=COLORS['primary'], 
+                                edgecolor='white', linewidth=1.5, density=True,
+                                label='Observed Distribution')
+    
+    # Fit normal distribution
+    mu, sigma = values.mean(), values.std()
+    x = np.linspace(values.min(), values.max(), 100)
+    normal_curve = norm.pdf(x, mu, sigma)
+    
+    # Plot normal curve
+    ax.plot(x, normal_curve, color=COLORS['highlight'], linewidth=3, 
+            label=f'Normal Fit (μ={mu:.1f}, σ={sigma:.1f})', linestyle='--')
+    
+    # Statistics lines
+    ax.axvline(mu, color=COLORS['secondary'], linestyle='-', linewidth=2.5, 
+               label=f'Mean: {mu:.2f}g', alpha=0.8)
+    ax.axvline(np.median(values), color=COLORS['tertiary'], linestyle='-', linewidth=2.5,
+               label=f'Median: {np.median(values):.2f}g', alpha=0.8)
+    
+    # Annotations
+    ax.text(0.98, 0.97, f'n = {len(values):,}', transform=ax.transAxes,
+            verticalalignment='top', horizontalalignment='right',
+            bbox=dict(boxstyle='round', facecolor='white', alpha=0.9, edgecolor=COLORS['neutral']),
+            fontsize=10, fontweight='bold')
+    
+    # Statistical properties
+    skewness = skew(values)
+    kurt = kurtosis(values)
+    stats_text = f'Skewness: {skewness:.2f}\nKurtosis: {kurt:.2f}\nMin: {values.min():.2f}g\nMax: {values.max():.2f}g'
+    ax.text(0.02, 0.97, stats_text, transform=ax.transAxes,
+            verticalalignment='top', horizontalalignment='left',
+            bbox=dict(boxstyle='round', facecolor='white', alpha=0.9, edgecolor=COLORS['neutral']),
+            fontsize=9)
+    
+    # Labels and title
+    ax.set_xlabel(f'{cfg.TARGET_NAMES[col]} (grams)', fontsize=12, fontweight='bold')
+    ax.set_ylabel('Probability Density', fontsize=12, fontweight='bold')
+    ax.set_title(f'{cfg.TARGET_NAMES[col]} Distribution', 
+                 fontsize=14, fontweight='bold', pad=15, color=COLORS['text'])
+    ax.legend(loc='upper right', framealpha=0.95, edgecolor=COLORS['neutral'])
+    ax.grid(True, alpha=0.3, linestyle='--')
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+# Add overall title
+fig.suptitle('Target Variable Distributions with Statistical Analysis', 
+             fontsize=18, fontweight='bold', y=0.995, color=COLORS['text'])
+
+plt.savefig(cfg.OUTPUT_PATH / 'professional_1_distributions.png', dpi=300, bbox_inches='tight', 
+            facecolor='white', edgecolor='none')
+print("✓ Saved: professional_1_distributions.png")
+plt.close()
+
+# ================================================================
+# 2. COMPREHENSIVE CORRELATION MATRIX  
+# ================================================================
+
+print("\n" + "="*80)
+print("Creating Visualization 2: Complete Correlation Matrix")
+print("="*80)
+
+# Calculate correlations
+correlation_matrix = train_pivot[cfg.TARGET_COLS].corr()
+
+# Create simple figure
+fig, ax = plt.subplots(figsize=(12, 10))
+
+# Professional RED-WHITE-GREEN diverging colormap
+# Red (negative) → White/Yellow (zero) → Green (positive)
+from matplotlib.colors import LinearSegmentedColormap
+colors_cmap = [
+    '#D73027',  # Dark red (strong negative)
+    '#FC8D59',  # Medium red
+    '#FEE090',  # Light red/orange
+    '#FFFFBF',  # White/Yellow (zero)
+    '#E0F3DB',  # Very light green
+    '#A8DDB5',  # Light green
+    '#66C2A4',  # Medium light green
+    '#2CA25F',  # Medium green
+    '#006D2C'   # Dark green (strong positive)
+]
+n_bins = 100
+cmap_diverging = LinearSegmentedColormap.from_list('red_white_green', colors_cmap, N=n_bins)
+
+# Create heatmap with full range -1 to 1
+im = ax.imshow(correlation_matrix, cmap=cmap_diverging, aspect='auto', vmin=-1, vmax=1)
+
+# Set ticks
+ax.set_xticks(np.arange(len(cfg.TARGET_COLS)))
+ax.set_yticks(np.arange(len(cfg.TARGET_COLS)))
+ax.set_xticklabels([cfg.TARGET_NAMES[col] for col in cfg.TARGET_COLS], 
+                    rotation=45, ha='right', fontsize=11, fontweight='bold')
+ax.set_yticklabels([cfg.TARGET_NAMES[col] for col in cfg.TARGET_COLS], 
+                    fontsize=11, fontweight='bold')
+
+# Add correlation values and significance
+for i in range(len(cfg.TARGET_COLS)):
+    for j in range(len(cfg.TARGET_COLS)):
+        corr_val = correlation_matrix.iloc[i, j]
+        
+        # Calculate p-value
+        if i != j:
+            _, p_val = pearsonr(train_pivot[cfg.TARGET_COLS[i]], 
+                               train_pivot[cfg.TARGET_COLS[j]])
+            sig = '***' if p_val < 0.001 else '**' if p_val < 0.01 else '*' if p_val < 0.05 else ''
+        else:
+            sig = ''
+        
+        # Choose text color based on correlation value
+        # Dark text for light colors (near zero), white text for dark colors (strong correlations)
+        if abs(corr_val) > 0.6:
+            text_color = 'white'
+        else:
+            text_color = 'black'
+        
+        # Main correlation value
+        ax.text(j, i, f'{corr_val:.3f}', ha='center', va='center',
+                color=text_color, fontsize=12, fontweight='bold')
+        
+        # Significance stars
+        if sig:
+            ax.text(j, i + 0.35, sig, ha='center', va='center',
+                    color=text_color, fontsize=10, fontweight='bold')
+
+# Colorbar with professional labels
+cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+cbar.set_label('Pearson Correlation Coefficient (r)', rotation=270, labelpad=25, 
+               fontsize=12, fontweight='bold')
+cbar.ax.tick_params(labelsize=10)
+
+# Add interpretive labels on colorbar
+cbar.ax.text(3.5, -0.9, 'Strong Negative', transform=cbar.ax.transData,
+            fontsize=9, fontweight='bold', color='#D73027', rotation=0)
+cbar.ax.text(3.5, 0.0, 'No Correlation', transform=cbar.ax.transData,
+            fontsize=9, fontweight='bold', color='#666666', rotation=0)
+cbar.ax.text(3.5, 0.9, 'Strong Positive', transform=cbar.ax.transData,
+            fontsize=9, fontweight='bold', color='#006D2C', rotation=0)
+
+# Title with significance legend
+title_text = 'Complete Correlation Matrix: All Target Variables\n'
+title_text += 'Red = Negative | Yellow = Zero | Green = Positive  |  '
+title_text += '*** p<0.001, ** p<0.01, * p<0.05'
+ax.set_title(title_text, fontsize=13, fontweight='bold', pad=20, color=COLORS['text'])
+
+# Grid
+ax.set_xticks(np.arange(len(cfg.TARGET_COLS)) - 0.5, minor=True)
+ax.set_yticks(np.arange(len(cfg.TARGET_COLS)) - 0.5, minor=True)
+ax.grid(which='minor', color='white', linestyle='-', linewidth=2)
+
+plt.tight_layout()
+plt.savefig(cfg.OUTPUT_PATH / 'professional_2_correlation_matrix.png', dpi=300, bbox_inches='tight',
+            facecolor='white', edgecolor='none')
+print("✓ Saved: professional_2_correlation_matrix.png")
+plt.close()
+
+# ================================================================
+# 3. DETAILED BOX PLOTS WITH STATISTICS
+# ================================================================
+
+print("\n" + "="*80)
+print("Creating Visualization 3: Detailed Box Plots")
+print("="*80)
+
+fig, ax = plt.subplots(figsize=(16, 8))
+
+# Prepare data
+data_for_box = [train_pivot[col].dropna().values for col in cfg.TARGET_COLS]
+labels = [cfg.TARGET_NAMES[col] for col in cfg.TARGET_COLS]
+
+# Create box plot
+bp = ax.boxplot(data_for_box, labels=labels, patch_artist=True,
+                widths=0.6, showmeans=True,
+                meanprops=dict(marker='D', markerfacecolor=COLORS['highlight'], 
+                              markeredgecolor='white', markersize=10),
+                medianprops=dict(color=COLORS['secondary'], linewidth=2.5),
+                boxprops=dict(facecolor=COLORS['primary'], alpha=0.7, 
+                             edgecolor=COLORS['text'], linewidth=1.5),
+                whiskerprops=dict(color=COLORS['text'], linewidth=1.5),
+                capprops=dict(color=COLORS['text'], linewidth=1.5),
+                flierprops=dict(marker='o', markerfacecolor=COLORS['highlight'], 
+                               markersize=5, alpha=0.5, markeredgecolor='none'))
+
+# Add detailed statistics
+for idx, (col, data) in enumerate(zip(cfg.TARGET_COLS, data_for_box)):
+    # Calculate statistics
+    q1 = np.percentile(data, 25)
+    median = np.median(data)
+    q3 = np.percentile(data, 75)
+    mean = np.mean(data)
+    iqr = q3 - q1
+    lower_whisker = q1 - 1.5 * iqr
+    upper_whisker = q3 + 1.5 * iqr
+    outliers = len(data[(data < lower_whisker) | (data > upper_whisker)])
+    
+    # Add text annotation
+    stats_text = f'Mean: {mean:.1f}g\nMedian: {median:.1f}g\nIQR: {iqr:.1f}g\nOutliers: {outliers}'
+    ax.text(idx + 1, ax.get_ylim()[1] * 0.95, stats_text,
+            ha='center', va='top', fontsize=9,
+            bbox=dict(boxstyle='round', facecolor='white', alpha=0.9, 
+                     edgecolor=COLORS['neutral']))
+
+# Labels and formatting
+ax.set_ylabel('Biomass (grams)', fontsize=13, fontweight='bold')
+ax.set_xlabel('Target Variables', fontsize=13, fontweight='bold')
+ax.set_title('Box Plot Analysis: Target Variables with Statistical Details', 
+             fontsize=15, fontweight='bold', pad=20, color=COLORS['text'])
+
+# Legend
+legend_elements = [
+    plt.Line2D([0], [0], marker='D', color='w', label='Mean',
+              markerfacecolor=COLORS['highlight'], markersize=10),
+    plt.Line2D([0], [0], color=COLORS['secondary'], linewidth=2.5, label='Median'),
+    plt.Line2D([0], [0], marker='o', color='w', label='Outliers',
+              markerfacecolor=COLORS['highlight'], markersize=7, alpha=0.5)
+]
+ax.legend(handles=legend_elements, loc='upper right', framealpha=0.95, 
+         edgecolor=COLORS['neutral'], fontsize=11)
+
+ax.grid(True, alpha=0.3, axis='y', linestyle='--')
+ax.set_axisbelow(True)
+plt.xticks(rotation=15, ha='right')
+
+plt.tight_layout()
+plt.savefig(cfg.OUTPUT_PATH / 'professional_3_boxplots.png', dpi=300, bbox_inches='tight',
+            facecolor='white', edgecolor='none')
+print("✓ Saved: professional_3_boxplots.png")
+plt.close()
+
+# ================================================================
+# 4. SCATTER PLOT MATRIX WITH REGRESSION LINES
+# ================================================================
+
+print("\n" + "="*80)
+print("Creating Visualization 4: Scatter Plot Matrix")
+print("="*80)
+
+# Select subset of targets for clarity
+main_targets = ['Dry_Green_g', 'Dry_Dead_g', 'GDM_g', 'Dry_Total_g']
+n_targets = len(main_targets)
+
+fig, axes = plt.subplots(n_targets, n_targets, figsize=(18, 18))
+
+for i, target1 in enumerate(main_targets):
+    for j, target2 in enumerate(main_targets):
+        ax = axes[i, j]
+        
+        if i == j:
+            # Diagonal: histogram with KDE
+            data = train_pivot[target1].dropna().values
+            ax.hist(data, bins=30, alpha=0.6, color=COLORS['primary'], 
+                   edgecolor='white', density=True)
+            
+            # KDE
+            from scipy.stats import gaussian_kde
+            kde = gaussian_kde(data)
+            x_range = np.linspace(data.min(), data.max(), 100)
+            ax.plot(x_range, kde(x_range), color=COLORS['highlight'], 
+                   linewidth=2.5, label='KDE')
+            
+            ax.set_ylabel('Density', fontsize=9)
+            if i == n_targets - 1:
+                ax.set_xlabel(cfg.TARGET_NAMES[target1], fontsize=10, fontweight='bold')
+        else:
+            # Off-diagonal: scatter plot
+            x_data = train_pivot[target2].dropna()
+            y_data = train_pivot[target1].dropna()
+            
+            # Align data
+            common_idx = x_data.index.intersection(y_data.index)
+            x_vals = x_data.loc[common_idx].values
+            y_vals = y_data.loc[common_idx].values
+            
+            # Scatter
+            ax.scatter(x_vals, y_vals, alpha=0.4, s=20, color=COLORS['primary'], 
+                      edgecolors='none')
+            
+            # Regression line
+            if len(x_vals) > 1:
+                z = np.polyfit(x_vals, y_vals, 1)
+                p = np.poly1d(z)
+                x_line = np.linspace(x_vals.min(), x_vals.max(), 100)
+                ax.plot(x_line, p(x_line), color=COLORS['highlight'], 
+                       linewidth=2.5, linestyle='--')
+                
+                # Correlation
+                r, p_val = pearsonr(x_vals, y_vals)
+                ax.text(0.05, 0.95, f'r={r:.3f}', transform=ax.transAxes,
+                       verticalalignment='top', fontsize=9, fontweight='bold',
+                       bbox=dict(boxstyle='round', facecolor='white', alpha=0.9))
+        
+        # Labels
+        if j == 0:
+            ax.set_ylabel(cfg.TARGET_NAMES[target1], fontsize=10, fontweight='bold')
+        if i == n_targets - 1:
+            ax.set_xlabel(cfg.TARGET_NAMES[target2], fontsize=10, fontweight='bold')
+        
+        ax.grid(True, alpha=0.2, linestyle='--')
+        ax.tick_params(labelsize=8)
+
+fig.suptitle('Scatter Plot Matrix: Pairwise Relationships Between Targets', 
+             fontsize=16, fontweight='bold', y=0.995)
+
+plt.tight_layout()
+plt.savefig(cfg.OUTPUT_PATH / 'professional_4_scatter_matrix.png', dpi=300, bbox_inches='tight',
+            facecolor='white', edgecolor='none')
+print("✓ Saved: professional_4_scatter_matrix.png")
+plt.close()
+
+# ================================================================
+# 5. DETAILED SAMPLE IMAGE ANALYSIS
+# ================================================================
+
+print("\n" + "="*80)
+print("Creating Visualization 5: Detailed Sample Image Analysis")
+print("="*80)
+
+# Select 6 sample images
+sample_images = train_pivot['image_path'].sample(min(6, len(train_pivot)), random_state=42).tolist()
+
+fig = plt.figure(figsize=(20, 16))
+gs = fig.add_gridspec(6, 4, hspace=0.35, wspace=0.3)  # 6 rows, 4 columns
+
+for idx, img_path in enumerate(sample_images):
+    img_name = os.path.basename(img_path)
+    full_path = cfg.TRAIN_PATH / img_name
+    
+    img = cv2.imread(str(full_path))
+    if img is None:
+        continue
+    
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    
+    # Main image (left column)
+    ax_img = fig.add_subplot(gs[idx, 0])
+    ax_img.imshow(img_rgb)
+    ax_img.set_title(f'Sample {idx+1}', fontsize=12, fontweight='bold')
+    ax_img.axis('off')
+    
+    # Add image properties
+    h, w, _ = img_rgb.shape
+    green_ratio = img_rgb[:,:,1] / (img_rgb.sum(axis=2) + 1)
+    brightness = img_rgb.mean()
+    
+    props_text = f'Size: {w}×{h}\nBrightness: {brightness:.1f}\nGreen Ratio: {green_ratio.mean():.3f}'
+    ax_img.text(0.02, 0.98, props_text, transform=ax_img.transAxes,
+               verticalalignment='top', fontsize=9,
+               bbox=dict(boxstyle='round', facecolor='white', alpha=0.9))
+    
+    # RGB histogram
+    ax_hist = fig.add_subplot(gs[idx, 1])
+    colors_rgb = ['#E74C3C', '#27AE60', '#3498DB']  # Red, Green, Blue
+    labels_rgb = ['Red', 'Green', 'Blue']
+    
+    for c, color, label in zip(range(3), colors_rgb, labels_rgb):
+        hist = cv2.calcHist([img_rgb], [c], None, [256], [0, 256])
+        ax_hist.plot(hist, color=color, linewidth=2, label=label, alpha=0.7)
+    
+    ax_hist.set_xlabel('Pixel Value', fontsize=9)
+    ax_hist.set_ylabel('Frequency', fontsize=9)
+    ax_hist.set_title('RGB Distribution', fontsize=10, fontweight='bold')
+    ax_hist.legend(fontsize=8)
+    ax_hist.grid(True, alpha=0.3)
+    ax_hist.set_xlim([0, 256])
+    
+    # Green channel analysis
+    ax_green = fig.add_subplot(gs[idx, 2])
+    green_channel = img_rgb[:,:,1]
+    ax_green.imshow(green_channel, cmap='Greens')
+    ax_green.set_title('Green Channel', fontsize=10, fontweight='bold')
+    ax_green.axis('off')
+    
+    # Vegetation index
+    ax_veg = fig.add_subplot(gs[idx, 3])
+    ax_veg.imshow(green_ratio, cmap='RdYlGn', vmin=0, vmax=0.5)
+    ax_veg.set_title('Vegetation Index', fontsize=10, fontweight='bold')
+    ax_veg.axis('off')
+
+fig.suptitle('Detailed Sample Image Analysis: RGB, Green Channel, and Vegetation Index', 
+             fontsize=16, fontweight='bold', y=0.995)
+
+plt.savefig(cfg.OUTPUT_PATH / 'professional_5_sample_images.png', dpi=300, bbox_inches='tight',
+            facecolor='white', edgecolor='none')
+print("✓ Saved: professional_5_sample_images.png")
+plt.close()
+
+# ================================================================
+# 6. HIERARCHICAL RELATIONSHIP VALIDATION
+# ================================================================
+
+print("\n" + "="*80)
+print("Creating Visualization 6: Hierarchical Relationships")
+print("="*80)
+
+fig, axes = plt.subplots(1, 2, figsize=(18, 7))
+
+# Green + Clover = GDM
+ax = axes[0]
+calculated = train_pivot['Dry_Green_g'] + train_pivot['Dry_Clover_g']
+actual = train_pivot['GDM_g']
+
+ax.scatter(calculated, actual, alpha=0.5, s=40, color=COLORS['primary'], 
+          edgecolors='white', linewidth=0.5)
+
+# Perfect match line
+max_val = max(calculated.max(), actual.max())
+ax.plot([0, max_val], [0, max_val], color=COLORS['highlight'], 
+       linewidth=3, linestyle='--', label='Perfect Match (y=x)')
+
+# Regression line
+z = np.polyfit(calculated, actual, 1)
+p = np.poly1d(z)
+x_line = np.linspace(calculated.min(), calculated.max(), 100)
+ax.plot(x_line, p(x_line), color=COLORS['secondary'], 
+       linewidth=2.5, label=f'Regression: y={z[0]:.3f}x+{z[1]:.2f}')
+
+# Statistics
+r, p_val = pearsonr(calculated, actual)
+rmse = np.sqrt(((calculated - actual) ** 2).mean())
+
+stats_text = f'Pearson r: {r:.4f}\np-value: {p_val:.2e}\nRMSE: {rmse:.2f}g\nn: {len(calculated):,}'
+ax.text(0.05, 0.95, stats_text, transform=ax.transAxes,
+       verticalalignment='top', fontsize=11, fontweight='bold',
+       bbox=dict(boxstyle='round', facecolor='white', alpha=0.95, 
+                edgecolor=COLORS['neutral'], linewidth=2))
+
+ax.set_xlabel('Green + Clover (calculated, grams)', fontsize=12, fontweight='bold')
+ax.set_ylabel('GDM (actual, grams)', fontsize=12, fontweight='bold')
+ax.set_title('Hierarchical Validation: Green + Clover = GDM', 
+            fontsize=13, fontweight='bold', pad=15)
+ax.legend(loc='lower right', fontsize=11, framealpha=0.95)
+ax.grid(True, alpha=0.3, linestyle='--')
+
+# GDM + Dead = Total
+ax = axes[1]
+calculated = train_pivot['GDM_g'] + train_pivot['Dry_Dead_g']
+actual = train_pivot['Dry_Total_g']
+
+ax.scatter(calculated, actual, alpha=0.5, s=40, color=COLORS['primary'], 
+          edgecolors='white', linewidth=0.5)
+
+max_val = max(calculated.max(), actual.max())
+ax.plot([0, max_val], [0, max_val], color=COLORS['highlight'], 
+       linewidth=3, linestyle='--', label='Perfect Match (y=x)')
+
+z = np.polyfit(calculated, actual, 1)
+p = np.poly1d(z)
+x_line = np.linspace(calculated.min(), calculated.max(), 100)
+ax.plot(x_line, p(x_line), color=COLORS['secondary'], 
+       linewidth=2.5, label=f'Regression: y={z[0]:.3f}x+{z[1]:.2f}')
+
+r, p_val = pearsonr(calculated, actual)
+rmse = np.sqrt(((calculated - actual) ** 2).mean())
+
+stats_text = f'Pearson r: {r:.4f}\np-value: {p_val:.2e}\nRMSE: {rmse:.2f}g\nn: {len(calculated):,}'
+ax.text(0.05, 0.95, stats_text, transform=ax.transAxes,
+       verticalalignment='top', fontsize=11, fontweight='bold',
+       bbox=dict(boxstyle='round', facecolor='white', alpha=0.95, 
+                edgecolor=COLORS['neutral'], linewidth=2))
+
+ax.set_xlabel('GDM + Dead (calculated, grams)', fontsize=12, fontweight='bold')
+ax.set_ylabel('Total Biomass (actual, grams)', fontsize=12, fontweight='bold')
+ax.set_title('Hierarchical Validation: GDM + Dead = Total', 
+            fontsize=13, fontweight='bold', pad=15)
+ax.legend(loc='lower right', fontsize=11, framealpha=0.95)
+ax.grid(True, alpha=0.3, linestyle='--')
+
+fig.suptitle('Hierarchical Relationship Validation with Statistical Analysis', 
+             fontsize=15, fontweight='bold', y=1.00)
+
+plt.tight_layout()
+plt.savefig(cfg.OUTPUT_PATH / 'professional_6_hierarchical.png', dpi=300, bbox_inches='tight',
+            facecolor='white', edgecolor='none')
+print("✓ Saved: professional_6_hierarchical.png")
+plt.close()
+
+# ================================================================
+# SUMMARY
+# ================================================================
+
+print("\n" + "="*80)
+print("EDA COMPLETE - ALL VISUALIZATIONS SAVED")
+print("="*80)
+print("\nGenerated Professional Visualizations:")
+print("  1. professional_1_distributions.png - Target distributions with bell curves")
+print("  2. professional_2_correlation_matrix.png - Complete correlation analysis")
+print("  3. professional_3_boxplots.png - Detailed box plots with statistics")
+print("  4. professional_4_scatter_matrix.png - Scatter plot matrix with regression")
+print("  5. professional_5_sample_images.png - Detailed image analysis")
+print("  6. professional_6_hierarchical.png - Hierarchical relationship validation")
+print("\nAll visualizations use consistent professional color scheme")
+print("Statistical details and annotations included on all plots")
+print("="*80)
+
+# %% [code] {"execution":{"iopub.status.busy":"2025-12-30T19:24:55.453527Z","iopub.execute_input":"2025-12-30T19:24:55.453842Z","iopub.status.idle":"2025-12-30T19:25:54.622363Z","shell.execute_reply.started":"2025-12-30T19:24:55.453821Z","shell.execute_reply":"2025-12-30T19:25:54.621619Z"}}
+import os
+import gc
+import math
+import json
+import random
+import argparse
+import shutil
+import time
+from copy import deepcopy
+from dataclasses import dataclass
+from typing import Optional, List, Tuple, Dict
+from pathlib import Path
+
+import cv2
+import timm
+import numpy as np
+import pandas as pd
+import albumentations as A
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.utils.data import Dataset, DataLoader
+from albumentations.pytorch import ToTensorV2
+from PIL import Image
+from tqdm.auto import tqdm
+
+from sklearn.model_selection import KFold
+from sklearn.linear_model import LinearRegression, Ridge, Lasso, BayesianRidge
+from sklearn.svm import SVR, LinearSVR
+from sklearn.ensemble import GradientBoostingRegressor, HistGradientBoostingRegressor, ExtraTreesRegressor
+from sklearn.dummy import DummyRegressor
+from sklearn.decomposition import PCA
+from sklearn.cross_decomposition import PLSRegression
+from sklearn.mixture import GaussianMixture
+from sklearn import preprocessing
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.preprocessing import StandardScaler
+
+from xgboost import XGBRegressor
+from lightgbm import LGBMRegressor
+from catboost import CatBoostRegressor
+
+from transformers import AutoProcessor, AutoImageProcessor, AutoModel, AutoTokenizer
+
+# ============================================================================
+# TIMEOUT MANAGER
+# ============================================================================
+class TimeoutManager:
+    """Manages execution time to prevent timeout"""
+    def __init__(self, max_time_seconds):
+        self.start_time = time.time()
+        self.max_time = max_time_seconds
+        
+    def time_elapsed(self):
+        return time.time() - self.start_time
+        
+    def time_remaining(self):
+        return self.max_time - self.time_elapsed()
+    
+    def should_continue(self, buffer_seconds=300):
+        """Check if we have enough time to continue (with 5 min buffer)"""
+        return self.time_remaining() > buffer_seconds
+    
+    def log_time(self, message=""):
+        elapsed = self.time_elapsed()
+        remaining = self.time_remaining()
+        print(f"[TIME] {message} | Elapsed: {elapsed/3600:.2f}h | Remaining: {remaining/3600:.2f}h")
+
+# ============================================================================
+# UTILITY FUNCTIONS
+# ============================================================================
+def seeding(SEED):
+    np.random.seed(SEED)
+    random.seed(SEED)
+    os.environ['PYTHONHASHSEED'] = str(SEED)
+    torch.manual_seed(SEED)
+    if torch.cuda.is_available(): 
+        torch.cuda.manual_seed(SEED)
+        torch.cuda.manual_seed_all(SEED)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+
+def flush():
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        torch.cuda.reset_peak_memory_stats()
+
+@dataclass
+class Config:
+    DATA_PATH: Path = Path("/kaggle/input/csiro-biomass/")
+    TRAIN_DATA_PATH: Path = DATA_PATH/'train'
+    TEST_DATA_PATH: Path = DATA_PATH/'test'
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    seed = 42
+
+cfg = Config()
+seeding(cfg.seed)
+
+TARGET_NAMES = ['Dry_Clover_g', 'Dry_Dead_g', 'Dry_Green_g', 'Dry_Total_g', 'GDM_g']
+weights = {
+    'Dry_Green_g': 0.1,
+    'Dry_Dead_g': 0.1,
+    'Dry_Clover_g': 0.1,
+    'GDM_g': 0.2,
+    'Dry_Total_g': 0.5,
+}
+TARGET_MAX = {
+    "Dry_Clover_g": 71.7865,
+    "Dry_Dead_g": 83.8407,
+    "Dry_Green_g": 157.9836,
+    "Dry_Total_g": 185.70,
+    "GDM_g": 157.9836,
+}
+
+def competition_metric(y_true, y_pred) -> float:
+    y_weighted = 0
+    for l, label in enumerate(TARGET_NAMES):
+        y_weighted = y_weighted + y_true[:, l].mean() * weights[label]
+    ss_res = 0
+    ss_tot = 0
+    for l, label in enumerate(TARGET_NAMES):
+        ss_res = ss_res + ((y_true[:, l] - y_pred[:, l])**2).mean() * weights[label]
+        ss_tot = ss_tot + ((y_true[:, l] - y_weighted)**2).mean() * weights[label]
+    return 1 - ss_res / ss_tot
+
+def pivot_table(df: pd.DataFrame)->pd.DataFrame:
+    if 'target' in df.columns.tolist():
+        df_pt = pd.pivot_table(
+            df, 
+            values='target', 
+            index=['image_path', 'Sampling_Date', 'State', 'Species', 'Pre_GSHH_NDVI', 'Height_Ave_cm'], 
+            columns='target_name', 
+            aggfunc='mean'
+        ).reset_index()
+    else:
+        df['target'] = 0
+        df_pt = pd.pivot_table(
+            df, 
+            values='target', 
+            index='image_path', 
+            columns='target_name', 
+            aggfunc='mean'
+        ).reset_index()
+    return df_pt
+
+def melt_table(df: pd.DataFrame) -> pd.DataFrame:
+    melted = df.melt(
+        id_vars='image_path',
+        value_vars=TARGET_NAMES,
+        var_name='target_name',
+        value_name='target'
+    )
+    melted['sample_id'] = (
+        melted['image_path']
+        .str.replace(r'^.*/', '', regex=True)
+        .str.replace('.jpg', '', regex=False)
+        + '__' + melted['target_name']
+    )
+    return melted[['sample_id', 'image_path', 'target_name', 'target']]
+
+def post_process_biomass(df_preds):
+    ordered_cols = ["Dry_Green_g", "Dry_Clover_g", "Dry_Dead_g", "GDM_g", "Dry_Total_g"]
+    Y = df_preds[ordered_cols].values.T
+    C = np.array([[1, 1, 0, -1,  0], [0, 0, 1,  1, -1]])
+    C_T = C.T
+    inv_CCt = np.linalg.inv(C @ C_T)
+    P = np.eye(5) - C_T @ inv_CCt @ C
+    Y_reconciled = P @ Y
+    Y_reconciled = Y_reconciled.T.clip(min=0)
+    df_out = df_preds.copy()
+    df_out[ordered_cols] = Y_reconciled
+    return df_out
+
+def split_image(image, patch_size=520, overlap=16):
+    h, w, c = image.shape
+    stride = patch_size - overlap
+    patches, coords = [], []
+    for y in range(0, h, stride):
+        for x in range(0, w, stride):
+            y1, x1, y2, x2 = y, x, y + patch_size, x + patch_size
+            patch = image[y1:y2, x1:x2, :]
+            if patch.shape[0] < patch_size or patch.shape[1] < patch_size:
+                pad_h = patch_size - patch.shape[0]
+                pad_w = patch_size - patch.shape[1]
+                patch = np.pad(patch, ((0,pad_h), (0,pad_w), (0,0)), mode='reflect')
+            patches.append(patch)
+            coords.append((y1, x1, y2, x2))
+    return patches, coords
+
+def get_model(model_path: str, device: str = 'cpu'):
+    model = AutoModel.from_pretrained(model_path, local_files_only=True)
+    processor = AutoImageProcessor.from_pretrained(model_path)
+    return model.eval().to(device), processor
+
+def compute_embeddings(model_path, df, patch_size=520):
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    model, processor = get_model(model_path=model_path, device=device)
+    IMAGE_PATHS, EMBEDDINGS = [], []
+    for i, row in tqdm(df.iterrows(), total=len(df), desc="Computing embeddings"):
+        img_path = row['image_path']
+        img = cv2.imread(img_path, cv2.IMREAD_COLOR)
+        patches, coords = split_image(img, patch_size=patch_size)
+        images = [Image.fromarray(p).convert("RGB") for p in patches]
+        inputs = processor(images=images, return_tensors="pt").to(model.device)
+        with torch.no_grad():
+            if 'siglip' in model_path:
+                features = model.get_image_features(**inputs)
+            elif 'dino' in model_path:
+                features = model(**inputs).pooler_output
+            else:
+                raise Exception("Model should be dino or siglip")
+        embeds = features.mean(dim=0).detach().cpu().numpy()
+        EMBEDDINGS.append(embeds)
+        IMAGE_PATHS.append(img_path)
+    embeddings = np.stack(EMBEDDINGS, axis=0)
+    n_features = embeddings.shape[1]
+    emb_columns = [f"emb{i+1}" for i in range(n_features)]
+    emb_df = pd.DataFrame(embeddings, columns=emb_columns)
+    emb_df['image_path'] = IMAGE_PATHS
+    df_final = df.merge(emb_df, on='image_path', how='left')
+    flush()
+    return df_final
+
+def generate_semantic_features(image_embeddings, model_path):
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    try:
+        model = AutoModel.from_pretrained(model_path).to(device)
+        tokenizer = AutoTokenizer.from_pretrained(model_path)
+    except Exception as e:
+        return None
+    concept_groups = {
+        "bare": ["bare soil", "dirt ground", "sparse vegetation", "exposed earth"],
+        "sparse": ["low density pasture", "thin grass", "short clipped grass"],
+        "medium": ["average pasture cover", "medium height grass", "grazed pasture"],
+        "dense": ["dense tall pasture", "thick grassy volume", "high biomass", "overgrown vegetation"],
+        "green": ["lush green vibrant pasture", "photosynthesizing leaves", "fresh growth"],
+        "dead": ["dry brown dead grass", "yellow straw", "senesced material", "standing hay"],
+        "clover": ["white clover", "trifolium repens", "broadleaf legume", "clover flowers"],
+        "grass": ["ryegrass", "blade-like leaves", "fescue", "grassy sward"],
+        "weeds": ["broadleaf weeds", "thistles", "non-pasture vegetation"]
+    }
+    concept_vectors = {}
+    with torch.no_grad():
+        for name, prompts in concept_groups.items():
+            inputs = tokenizer(prompts, padding="max_length", return_tensors="pt").to(device)
+            emb = model.get_text_features(**inputs)
+            emb = emb / emb.norm(p=2, dim=-1, keepdim=True)
+            concept_vectors[name] = emb.mean(dim=0, keepdim=True)
+    if isinstance(image_embeddings, np.ndarray):
+        img_tensor = torch.tensor(image_embeddings, dtype=torch.float32).to(device)
+    else:
+        img_tensor = image_embeddings.to(device)
+    img_tensor = img_tensor / img_tensor.norm(p=2, dim=-1, keepdim=True)
+    scores = {}
+    for name, vec in concept_vectors.items():
+        scores[name] = torch.matmul(img_tensor, vec.T).cpu().numpy().flatten()
+    df_scores = pd.DataFrame(scores)
+    df_scores['ratio_greenness'] = df_scores['green'] / (df_scores['green'] + df_scores['dead'] + 1e-6)
+    df_scores['ratio_clover'] = df_scores['clover'] / (df_scores['clover'] + df_scores['grass'] + 1e-6)
+    df_scores['ratio_cover'] = (df_scores['dense'] + df_scores['medium']) / (df_scores['bare'] + df_scores['sparse'] + 1e-6)
+    df_scores['max_density'] = df_scores[['bare', 'sparse', 'medium', 'dense']].max(axis=1)
+    return df_scores.values
+
+class SupervisedEmbeddingEngine(BaseEstimator, TransformerMixin):
+    def __init__(self, n_pca=0.98, n_pls=8, n_gmm=5, random_state=42):
+        self.n_pca = n_pca
+        self.n_pls = n_pls
+        self.n_gmm = n_gmm
+        self.random_state = random_state
+        self.scaler = StandardScaler()
+        self.pca = PCA(n_components=n_pca, random_state=random_state)
+        self.pls = PLSRegression(n_components=n_pls, scale=False)
+        self.gmm = GaussianMixture(n_components=n_gmm, covariance_type='diag', random_state=random_state)
+        self.pls_fitted_ = False
+
+    def fit(self, X, y=None, X_semantic=None):
+        X_scaled = self.scaler.fit_transform(X)
+        self.pca.fit(X_scaled)
+        self.gmm.fit(X_scaled)
+        if y is not None:
+            y_clean = y.values if hasattr(y, 'values') else y
+            self.pls.fit(X_scaled, y_clean)
+            self.pls_fitted_ = True
+        return self
+
+    def transform(self, X, X_semantic=None):
+        X_scaled = self.scaler.transform(X)
+        return self._generate_features(X_scaled, X_semantic)
+
+    def _generate_features(self, X_scaled, X_semantic=None):
+        features = []
+        f_pca = self.pca.transform(X_scaled)
+        features.append(f_pca)
+        if self.pls_fitted_:
+            f_pls = self.pls.transform(X_scaled)
+            features.append(f_pls)
+        f_gmm = self.gmm.predict_proba(X_scaled)
+        features.append(f_gmm)
+        if X_semantic is not None:
+            sem_norm = (X_semantic - np.mean(X_semantic, axis=0)) / (np.std(X_semantic, axis=0) + 1e-6)
+            features.append(sem_norm)
+        return np.hstack(features)
+
+def compare_results(oof, train_data):
+    y_oof_df = pd.DataFrame(oof, columns=TARGET_NAMES)
+    raw_score = competition_metric(train_data[TARGET_NAMES].values, y_oof_df.values)
+    print(f"Raw CV Score: {raw_score:.6f}")
+    y_oof_proc = post_process_biomass(y_oof_df)
+    proc_score = competition_metric(train_data[TARGET_NAMES].values, y_oof_proc.values)
+    print(f"Processed CV Score: {proc_score:.6f}")
+    print(f"Improvement: {raw_score - proc_score:.6f}")
+
+def cross_validate(model, train_data, test_data, feature_engine, semantic_train=None, semantic_test=None, target_transform='max', seed=42):
+    n_splits = train_data['fold'].nunique()
+    target_max_arr = np.array([TARGET_MAX[t] for t in TARGET_NAMES], dtype=float)
+    y_true = train_data[TARGET_NAMES]
+    y_pred = pd.DataFrame(0.0, index=train_data.index, columns=TARGET_NAMES)
+    y_pred_test = np.zeros([len(test_data), len(TARGET_NAMES)], dtype=float)
+    
+    COLUMNS = [col for col in train_data.columns if col.startswith('emb')]
+    
+    for fold in range(n_splits):
+        seeding(seed*(seed//2 + fold))
+        train_mask = train_data['fold'] != fold
+        valid_mask = train_data['fold'] == fold
+        val_idx = train_data[valid_mask].index
+        X_train_raw = train_data[train_mask][COLUMNS].values
+        X_valid_raw = train_data[valid_mask][COLUMNS].values
+        X_test_raw = test_data[COLUMNS].values
+        sem_train_fold = semantic_train[train_mask] if semantic_train is not None else None
+        sem_valid_fold = semantic_train[valid_mask] if semantic_train is not None else None
+        y_train = train_data[train_mask][TARGET_NAMES].values
+        y_valid = train_data[valid_mask][TARGET_NAMES].values
+        if target_transform == 'log':
+            y_train_proc = np.log1p(y_train)
+        elif target_transform == 'max':
+            y_train_proc = y_train / target_max_arr
+        else:
+            y_train_proc = y_train
+        engine = deepcopy(feature_engine)
+        engine.fit(X_train_raw, y=y_train_proc, X_semantic=sem_train_fold)
+        x_train_eng = engine.transform(X_train_raw, X_semantic=sem_train_fold)
+        x_valid_eng = engine.transform(X_valid_raw, X_semantic=sem_valid_fold)
+        x_test_eng = engine.transform(X_test_raw, X_semantic=semantic_test)
+        fold_valid_pred = np.zeros_like(y_valid)
+        fold_test_pred = np.zeros([len(test_data), len(TARGET_NAMES)])
+        for k in range(len(TARGET_NAMES)):
+            regr = deepcopy(model)
+            regr.fit(x_train_eng, y_train_proc[:, k])
+            pred_valid_raw = regr.predict(x_valid_eng)
+            pred_test_raw = regr.predict(x_test_eng)
+            if target_transform == 'log':
+                pred_valid_inv = np.expm1(pred_valid_raw)
+                pred_test_inv = np.expm1(pred_test_raw)
+            elif target_transform == 'max':
+                pred_valid_inv = (pred_valid_raw * target_max_arr[k])
+                pred_test_inv = (pred_test_raw * target_max_arr[k])
+            else:
+                pred_valid_inv = pred_valid_raw
+                pred_test_inv = pred_test_raw
+            fold_valid_pred[:, k] = pred_valid_inv
+            fold_test_pred[:, k] = pred_test_inv
+        y_pred.loc[val_idx] = fold_valid_pred
+        y_pred_test += fold_test_pred / n_splits
+    full_cv = competition_metric(y_true.values, y_pred.values)
+    print(f"Full CV Score: {full_cv:.6f}")
+    return y_pred.values, y_pred_test
+
+# ============================================================================
+# DINO MODEL ARCHITECTURES
+# ============================================================================
+class FeedForward(nn.Module):
+    def __init__(self, dim, mlp_ratio=4.0, dropout=0.0):
+        super().__init__()
+        hid = int(dim * mlp_ratio)
+        self.net = nn.Sequential(
+            nn.Linear(dim, hid), nn.GELU(), nn.Dropout(dropout),
+            nn.Linear(hid, dim), nn.Dropout(dropout))
+
+    def forward(self, x): return self.net(x)
+
+class AttentionBlock(nn.Module):
+    def __init__(self, dim, heads=8, dropout=0.0, mlp_ratio=4.0):
+        super().__init__()
+        self.norm1 = nn.LayerNorm(dim)
+        self.attn = nn.MultiheadAttention(dim, heads, dropout=dropout, batch_first=True)
+        self.norm2 = nn.LayerNorm(dim)
+        self.ff = FeedForward(dim, mlp_ratio=mlp_ratio, dropout=dropout)
+
+    def forward(self, x):
+        h = self.norm1(x)
+        attn_out, _ = self.attn(h, h, h, need_weights=False)
+        x = x + attn_out
+        x = x + self.ff(self.norm2(x))
+        return x
+
+class MobileViTBlock(nn.Module):
+    def __init__(self, dim, heads=4, depth=2, patch=(2, 2), dropout=0.0):
+        super().__init__()
+        self.local = nn.Sequential(
+            nn.Conv2d(dim, dim, 3, padding=1, groups=dim),
+            nn.Conv2d(dim, dim, 1), nn.GELU())
+        self.patch = patch
+        self.transformer = nn.ModuleList([AttentionBlock(dim, heads=heads, dropout=dropout, mlp_ratio=2.0) for _ in range(depth)])
+        self.fuse = nn.Conv2d(dim * 2, dim, kernel_size=1)
+
+    def forward(self, x: torch.Tensor):
+        local_feat = self.local(x)
+        B, C, H, W = local_feat.shape
+        ph, pw = self.patch
+        new_h = math.ceil(H / ph) * ph
+        new_w = math.ceil(W / pw) * pw
+        if new_h != H or new_w != W:
+            local_feat = F.interpolate(local_feat, size=(new_h, new_w), mode="bilinear", align_corners=False)
+            H, W = new_h, new_w
+        tokens = local_feat.unfold(2, ph, ph).unfold(3, pw, pw)
+        tokens = tokens.contiguous().view(B, C, -1, ph, pw)
+        tokens = tokens.permute(0, 2, 3, 4, 1).reshape(B, -1, C)
+        for blk in self.transformer: tokens = blk(tokens)
+        feat = tokens.view(B, -1, ph * pw, C).permute(0, 3, 1, 2)
+        nh = H // ph
+        nw = W // pw
+        feat = feat.view(B, C, nh, nw, ph, pw).permute(0, 1, 2, 4, 3, 5)
+        feat = feat.reshape(B, C, H, W)
+        if feat.shape[-2:] != x.shape[-2:]:
+            feat = F.interpolate(feat, size=x.shape[-2:], mode="bilinear", align_corners=False)
+        return self.fuse(torch.cat([x, feat], dim=1))
+
+class SpatialReductionAttention(nn.Module):
+    def __init__(self, dim, heads=8, sr_ratio=2, dropout=0.0):
+        super().__init__()
+        self.heads = heads
+        self.scale = (dim // heads) ** -0.5
+        self.q = nn.Linear(dim, dim)
+        self.kv = nn.Linear(dim, dim * 2)
+        self.sr_ratio = sr_ratio
+        if sr_ratio > 1:
+            self.sr = nn.Conv2d(dim, dim, kernel_size=sr_ratio, stride=sr_ratio)
+            self.norm = nn.LayerNorm(dim)
+        else: self.sr = None
+        self.proj = nn.Linear(dim, dim)
+        self.drop = nn.Dropout(dropout)
+
+    def forward(self, x, hw: Tuple[int, int]):
+        B, N, C = x.shape
+        q = self.q(x).reshape(B, N, self.heads, C // self.heads).permute(0, 2, 1, 3)
+        if self.sr is not None:
+            H, W = hw
+            feat = x.transpose(1, 2).reshape(B, C, H, W)
+            feat = self.sr(feat)
+            feat = feat.reshape(B, C, -1).transpose(1, 2)
+            feat = self.norm(feat)
+        else: feat = x
+        kv = self.kv(feat)
+        k, v = kv.chunk(2, dim=-1)
+        k = k.reshape(B, -1, self.heads, C // self.heads).permute(0, 2, 3, 1)
+        v = v.reshape(B, -1, self.heads, C // self.heads).permute(0, 2, 1, 3)
+        attn = torch.matmul(q, k) * self.scale
+        attn = attn.softmax(dim=-1)
+        attn = self.drop(attn)
+        out = torch.matmul(attn, v).permute(0, 2, 1, 3).reshape(B, N, C)
+        return self.proj(out)
+
+class PVTBlock(nn.Module):
+    def __init__(self, dim, heads=8, sr_ratio=2, dropout=0.0, mlp_ratio=4.0):
+        super().__init__()
+        self.norm1 = nn.LayerNorm(dim)
+        self.sra = SpatialReductionAttention(dim, heads=heads, sr_ratio=sr_ratio, dropout=dropout)
+        self.norm2 = nn.LayerNorm(dim)
+        self.ff = FeedForward(dim, mlp_ratio=mlp_ratio, dropout=dropout)
+
+    def forward(self, x, hw: Tuple[int, int]):
+        x = x + self.sra(self.norm1(x), hw)
+        x = x + self.ff(self.norm2(x))
+        return x
+
+class LocalMambaBlock(nn.Module):
+    def __init__(self, dim, kernel_size=5, dropout=0.0):
+        super().__init__()
+        self.norm = nn.LayerNorm(dim)
+        self.dwconv = nn.Conv1d(dim, dim, kernel_size=kernel_size, padding=kernel_size//2, groups=dim)
+        self.gate = nn.Linear(dim, dim)
+        self.proj = nn.Linear(dim, dim)
+        self.drop = nn.Dropout(dropout)
+
+    def forward(self, x):
+        shortcut = x
+        x = self.norm(x)
+        g = torch.sigmoid(self.gate(x))
+        x = (x * g).transpose(1, 2)
+        x = self.dwconv(x).transpose(1, 2)
+        x = self.proj(x)
+        x = self.drop(x)
+        return shortcut + x
+
+class T2TRetokenizer(nn.Module):
+    def __init__(self, dim, depth=2, heads=4, dropout=0.0):
+        super().__init__()
+        self.blocks = nn.ModuleList([AttentionBlock(dim, heads=heads, dropout=dropout, mlp_ratio=2.0) for _ in range(depth)])
+
+    def forward(self, tokens: torch.Tensor, grid_hw: Tuple[int, int]):
+        B, T, C = tokens.shape
+        H, W = grid_hw
+        feat_map = tokens.transpose(1, 2).reshape(B, C, H, W)
+        seq = feat_map.flatten(2).transpose(1, 2)
+        for blk in self.blocks: seq = blk(seq)
+        seq_map = seq.transpose(1, 2).reshape(B, C, H, W)
+        pooled = F.adaptive_avg_pool2d(seq_map, (2, 2))
+        retokens = pooled.flatten(2).transpose(1, 2)
+        return retokens, seq_map
+
+class CrossScaleFusion(nn.Module):
+    def __init__(self, dim, heads=6, dropout=0.0, layers=2):
+        super().__init__()
+        self.layers_s = nn.ModuleList([AttentionBlock(dim, heads=heads, dropout=dropout, mlp_ratio=2.0) for _ in range(layers)])
+        self.layers_b = nn.ModuleList([AttentionBlock(dim, heads=heads, dropout=dropout, mlp_ratio=2.0) for _ in range(layers)])
+        self.cross_s = nn.ModuleList([nn.MultiheadAttention(dim, heads, dropout=dropout, batch_first=True, kdim=dim, vdim=dim) for _ in range(layers)])
+        self.cross_b = nn.ModuleList([nn.MultiheadAttention(dim, heads, dropout=dropout, batch_first=True, kdim=dim, vdim=dim) for _ in range(layers)])
+        self.norm_s = nn.LayerNorm(dim)
+        self.norm_b = nn.LayerNorm(dim)
+
+    def forward(self, tok_s: torch.Tensor, tok_b: torch.Tensor):
+        B, Ts, C = tok_s.shape
+        Tb = tok_b.shape[1]
+        cls_s = tok_s.new_zeros(B, 1, C)
+        cls_b = tok_b.new_zeros(B, 1, C)
+        tok_s = torch.cat([cls_s, tok_s], dim=1)
+        tok_b = torch.cat([cls_b, tok_b], dim=1)
+        for ls, lb, cs, cb in zip(self.layers_s, self.layers_b, self.cross_s, self.cross_b):
+            tok_s = ls(tok_s)
+            tok_b = lb(tok_b)
+            q_s = self.norm_s(tok_s[:, :1])
+            q_b = self.norm_b(tok_b[:, :1])
+            cls_s_upd, _ = cs(q_s, torch.cat([tok_b, q_b], dim=1), torch.cat([tok_b, q_b], dim=1), need_weights=False)
+            cls_b_upd, _ = cb(q_b, torch.cat([tok_s, q_s], dim=1), torch.cat([tok_s, q_s], dim=1), need_weights=False)
+            tok_s = torch.cat([tok_s[:, :1] + cls_s_upd, tok_s[:, 1:]], dim=1)
+            tok_b = torch.cat([tok_b[:, :1] + cls_b_upd, tok_b[:, 1:]], dim=1)
+        tokens = torch.cat([tok_s[:, :1], tok_b[:, :1], tok_s[:, 1:], tok_b[:, 1:]], dim=1)
+        return tokens
+
+class TileEncoder(nn.Module):
+    def __init__(self, backbone: nn.Module, input_res: int):
+        super().__init__()
+        self.backbone = backbone
+        self.input_res = input_res
+
+    def forward(self, x: torch.Tensor, grid: Tuple[int, int]):
+        B, C, H, W = x.shape
+        r, c = grid
+        hs = torch.linspace(0, H, steps=r + 1, device=x.device).round().long()
+        ws = torch.linspace(0, W, steps=c + 1, device=x.device).round().long()
+        tiles = []
+        for i in range(r):
+            for j in range(c):
+                rs, re = hs[i].item(), hs[i + 1].item()
+                cs, ce = ws[j].item(), ws[j + 1].item()
+                xt = x[:, :, rs:re, cs:ce]
+                if xt.shape[-2:] != (self.input_res, self.input_res):
+                    xt = F.interpolate(xt, size=(self.input_res, self.input_res), mode="bilinear", align_corners=False)
+                tiles.append(xt)
+        tiles = torch.stack(tiles, dim=1)
+        flat = tiles.view(-1, C, self.input_res, self.input_res)
+        feats = self.backbone(flat)
+        return feats.view(B, -1, feats.shape[-1])
+
+class PyramidMixer(nn.Module):
+    def __init__(self, dim_in: int, dims: Tuple[int, int, int], mobilevit_heads=4, mobilevit_depth=2, sra_heads=6, sra_ratio=2, mamba_depth=3, mamba_kernel=5, dropout=0.0):
+        super().__init__()
+        c1, c2, c3 = dims
+        self.proj1 = nn.Linear(dim_in, c1)
+        self.mobilevit = MobileViTBlock(c1, heads=mobilevit_heads, depth=mobilevit_depth, dropout=dropout)
+        self.proj2 = nn.Linear(c1, c2)
+        self.pvt = PVTBlock(c2, heads=sra_heads, sr_ratio=sra_ratio, dropout=dropout, mlp_ratio=3.0)
+        self.mamba_local = LocalMambaBlock(c2, kernel_size=mamba_kernel, dropout=dropout)
+        self.proj3 = nn.Linear(c2, c3)
+        self.mamba_global = nn.ModuleList([LocalMambaBlock(c3, kernel_size=mamba_kernel, dropout=dropout) for _ in range(mamba_depth)])
+        self.final_attn = AttentionBlock(c3, heads=min(8, c3//64+1), dropout=dropout, mlp_ratio=2.0)
+
+    def _tokens_to_map(self, tokens: torch.Tensor, target_hw: Tuple[int, int]):
+        B, N, C = tokens.shape
+        H, W = target_hw
+        need = H * W
+        if N < need:
+            pad = tokens.new_zeros(B, need-N, C)
+            tokens = torch.cat([tokens, pad], dim=1)
+        tokens = tokens[:, :need, :]
+        return tokens.transpose(1, 2).reshape(B, C, H, W)
+
+    @staticmethod
+    def _fit_hw(n_tokens: int) -> Tuple[int, int]:
+        h = int(math.sqrt(n_tokens))
+        w = h
+        while h * w < n_tokens:
+            w += 1
+            if h * w < n_tokens: h += 1
+        return h, w
+
+    def forward(self, tokens: torch.Tensor):
+        B, N, C = tokens.shape
+        map_hw = (3, 4)
+        feat_map = self._tokens_to_map(tokens, map_hw)
+        t1 = self.proj1(tokens)
+        m1 = self._tokens_to_map(t1, map_hw)
+        m1 = self.mobilevit(m1)
+        t1_out = m1.flatten(2).transpose(1, 2)[:, :N]
+        t2 = self.proj2(t1_out)
+        new_len = max(4, N//2)
+        t2 = t2[:, :new_len] + F.adaptive_avg_pool1d(t2.transpose(1, 2), new_len).transpose(1, 2)
+        hw2 = self._fit_hw(t2.size(1))
+        if t2.size(1) < hw2[0] * hw2[1]:
+            pad = t2.new_zeros(B, hw2[0]*hw2[1]-t2.size(1), t2.size(2))
+            t2 = torch.cat([t2, pad], dim=1)
+        t2 = self.pvt(t2, hw2)
+        t2 = self.mamba_local(t2)
+        t3 = self.proj3(t2)
+        pooled = torch.stack([t3.mean(dim=1), t3.max(dim=1).values], dim=1)
+        t3 = pooled
+        for blk in self.mamba_global: t3 = blk(t3)
+        t3 = self.final_attn(t3)
+        return t3.mean(dim=1), {"stage1_map": m1.detach(), "stage2_tokens": t2.detach(), "stage3_tokens": t3.detach()}
+
+@dataclass
+class TrainCFG:
+    dropout: float = 0.1
+    hidden_ratio: float = 0.35
+    dino_candidates: Tuple[str, ...] = ("vit_base_patch14_dinov2", "vit_base_patch14_reg4_dinov2", "vit_small_patch14_dinov2")
+    small_grid: Tuple[int, int] = (4, 4)
+    big_grid: Tuple[int, int] = (2, 2)
+    t2t_depth: int = 2
+    cross_layers: int = 2
+    cross_heads: int = 6
+    pyramid_dims: Tuple[int, int, int] = (384, 512, 640)
+    mobilevit_heads: int = 4
+    mobilevit_depth: int = 2
+    sra_heads: int = 8
+    sra_ratio: int = 2
+    mamba_depth: int = 3
+    mamba_kernel: int = 5
+    aux_head: bool = True
+    aux_loss_weight: float = 0.4
+    ALL_TARGET_COLS: Tuple[str, ...] = ("Dry_Green_g", "Dry_Dead_g", "Dry_Clover_g", "GDM_g", "Dry_Total_g")
+
+CFG = TrainCFG()
+
+def update_cfg_from_checkpoint(cfg_dict: dict):
+    global CFG
+    if not cfg_dict: return
+    for k, v in cfg_dict.items():
+        if hasattr(CFG, k): setattr(CFG, k, v)
+
+class CrossPVT_T2T_MambaDINO(nn.Module):
+    def __init__(self, dropout: float = 0.1, hidden_ratio: float = 0.35):
+        super().__init__()
+        self.backbone, self.feat_dim, self.backbone_name, self.input_res = self._build_dino_backbone()
+        self.tile_encoder = TileEncoder(self.backbone, self.input_res)
+        self.t2t = T2TRetokenizer(self.feat_dim, depth=CFG.t2t_depth, heads=CFG.cross_heads, dropout=dropout)
+        self.cross = CrossScaleFusion(self.feat_dim, heads=CFG.cross_heads, dropout=dropout, layers=CFG.cross_layers)
+        self.pyramid = PyramidMixer(dim_in=self.feat_dim, dims=CFG.pyramid_dims, mobilevit_heads=CFG.mobilevit_heads, mobilevit_depth=CFG.mobilevit_depth, sra_heads=CFG.sra_heads, sra_ratio=CFG.sra_ratio, mamba_depth=CFG.mamba_depth, mamba_kernel=CFG.mamba_kernel, dropout=dropout)
+        self.combined_dim = CFG.pyramid_dims[-1] * 2
+        hidden = max(32, int(self.combined_dim * hidden_ratio))
+        def head(): return nn.Sequential(nn.Linear(self.combined_dim, hidden), nn.GELU(), nn.Dropout(dropout), nn.Linear(hidden, 1))
+        self.head_green = head()
+        self.head_clover = head()
+        self.head_dead = head()
+        self.score_head = nn.Sequential(nn.LayerNorm(self.combined_dim), nn.Linear(self.combined_dim, 1))
+        self.aux_head = nn.Sequential(nn.LayerNorm(CFG.pyramid_dims[1]), nn.Linear(CFG.pyramid_dims[1], 5)) if CFG.aux_head else None
+        self.softplus = nn.Softplus(beta=1.0)
+        self.cross_gate_left = nn.Linear(CFG.pyramid_dims[-1], CFG.pyramid_dims[-1])
+        self.cross_gate_right = nn.Linear(CFG.pyramid_dims[-1], CFG.pyramid_dims[-1])
+
+    def _build_dino_backbone(self):
+        last_err = None
+        for name in CFG.dino_candidates:
+            for gp in ["token", "avg", "__default__"]:
+                try:
+                    if gp == "__default__":
+                        m = timm.create_model(name, pretrained=False, num_classes=0)
+                        gp_str = "default"
+                    else:
+                        m = timm.create_model(name, pretrained=False, num_classes=0, global_pool=gp)
+                        gp_str = gp
+                    feat = m.num_features
+                    input_res = self._infer_input_res(m)
+                    if hasattr(m, "set_grad_checkpointing"):
+                        m.set_grad_checkpointing(True)
+                    return m, feat, name, int(input_res)
+                except Exception as e: last_err = e; continue
+        raise RuntimeError(f"Cannot create any DINO backbone. Last error: {last_err}")
+
+    @staticmethod
+    def _infer_input_res(m) -> int:
+        if hasattr(m, "patch_embed") and hasattr(m.patch_embed, "img_size"):
+            isz = m.patch_embed.img_size
+            return int(isz if isinstance(isz, (int, float)) else isz[0])
+        if hasattr(m, "img_size"):
+            isz = m.img_size
+            return int(isz if isinstance(isz, (int, float)) else isz[0])
+        dc = getattr(m, "default_cfg", {}) or {}
+        ins = dc.get("input_size", None)
+        if ins:
+            if isinstance(ins, (tuple, list)) and len(ins) >= 2:
+                return int(ins[1])
+            return int(ins if isinstance(ins, (int, float)) else 224)
+        return 518
+
+    def _half_forward(self, x_half: torch.Tensor):
+        tiles_small = self.tile_encoder(x_half, CFG.small_grid)
+        tiles_big = self.tile_encoder(x_half, CFG.big_grid)
+        t2, stage1_map = self.t2t(tiles_small, CFG.small_grid)
+        fused = self.cross(t2, tiles_big)
+        feat, feat_maps = self.pyramid(fused)
+        feat_maps["stage1_map"] = stage1_map
+        return feat, feat_maps
+
+    def _merge_heads(self, f_l: torch.Tensor, f_r: torch.Tensor):
+        g_l = torch.sigmoid(self.cross_gate_left(f_r))
+        g_r = torch.sigmoid(self.cross_gate_right(f_l))
+        f_l = f_l * g_l
+        f_r = f_r * g_r
+        f = torch.cat([f_l, f_r], dim=1)
+        green_pos = self.softplus(self.head_green(f))
+        clover_pos = self.softplus(self.head_clover(f))
+        dead_pos = self.softplus(self.head_dead(f))
+        gdm = green_pos + clover_pos
+        total = gdm + dead_pos
+        return total, gdm, green_pos, f
+
+    def forward(self, *inputs, x_left=None, x_right=None, return_features: bool = False):
+        if inputs:
+            if len(inputs) == 1:
+                first = inputs[0]
+                if isinstance(first, (tuple, list)):
+                    if len(first) >= 1: x_left = first[0]
+                    if len(first) >= 2: x_right = first[1]
+                else: x_left = first
+            else: x_left = inputs[0]; x_right = inputs[1]
+        if x_left is None or (isinstance(x_left, torch.Tensor) and x_left.shape[0] == 0):
+            device = next(self.parameters()).device
+            dtype = next(self.parameters()).dtype
+            zero = torch.zeros(0, 1, device=device, dtype=dtype)
+            out = {"total": zero, "gdm": zero, "green": zero, "score_feat": torch.zeros(0, self.combined_dim, device=device, dtype=dtype)}
+            if self.aux_head is not None:
+                out["aux"] = torch.zeros(0, len(CFG.ALL_TARGET_COLS), device=device, dtype=dtype)
+            if return_features: out["feature_maps"] = {}
+            return out
+        if x_right is None:
+            if isinstance(x_left, torch.Tensor) and x_left.shape[1] % 2 == 0:
+                x_left, x_right = torch.chunk(x_left, 2, dim=1)
+            else: raise ValueError("Missing x_right input.")
+        feat_l, feats_l = self._half_forward(x_left)
+        feat_r, feats_r = self._half_forward(x_right)
+        total, gdm, green, f_concat = self._merge_heads(feat_l, feat_r)
+        out = {"total": total, "gdm": gdm, "green": green, "score_feat": f_concat}
+        if self.aux_head is not None:
+            aux_tokens = torch.cat([feats_l["stage2_tokens"], feats_r["stage2_tokens"]], dim=1)
+            aux_pred = self.softplus(self.aux_head(aux_tokens.mean(dim=1)))
+            out["aux"] = aux_pred
+        if return_features:
+            out["feature_maps"] = {"stage1_left": feats_l.get("stage1_map"), "stage1_right": feats_r.get("stage1_map"), "stage3_left": feats_l.get("stage3_tokens"), "stage3_right": feats_r.get("stage3_tokens")}
+        return out
+
+class INF_CFG:
+    BASE_PATH = "/kaggle/input/csiro-biomass"
+    TEST_CSV = os.path.join(BASE_PATH, "test.csv")
+    TEST_IMAGE_DIR = os.path.join(BASE_PATH, "test")
+    EXPERIMENT_DIR = "/kaggle/input/csiro/pytorch/default/12"
+    CKPT_PATTERN_FOLD_X = os.path.join(EXPERIMENT_DIR, "fold_{fold}", "checkpoints", "best_wr2.pt")
+    CKPT_PATTERN_FOLDX = os.path.join(EXPERIMENT_DIR, "fold{fold}", "checkpoints", "best_wr2.pt")
+    N_FOLDS = 3  # Reduced from 5 to 3 for speed
+    SUBMISSION_FILE = "submission3.csv"
+    DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    BATCH_SIZE = 4  # Increased from 1 to 4
+    NUM_WORKERS = 0
+    MIXED_PRECISION = True
+    USE_TTA = True
+    TTA_TRANSFORMS = ["original", "hflip"]  # Reduced from 3 to 2
+    ALL_TARGET_COLS = ["Dry_Green_g", "Dry_Dead_g", "Dry_Clover_g", "GDM_g", "Dry_Total_g"]
+
+class TestBiomassDataset(Dataset):
+    def __init__(self, df: pd.DataFrame, transform, image_dir: str):
+        self.df = df.reset_index(drop=True)
+        self.transform = transform
+        self.image_dir = image_dir
+        self.paths = self.df["image_path"].values
+
+    def __len__(self): return len(self.df)
+
+    def __getitem__(self, idx):
+        filename = os.path.basename(self.paths[idx])
+        full_path = os.path.join(self.image_dir, filename)
+        img = cv2.imread(full_path)
+        if img is None: img = np.zeros((1000, 2000, 3), dtype=np.uint8)
+        else: img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        h, w, _ = img.shape
+        mid = w // 2
+        left = img[:, :mid]
+        right = img[:, mid:]
+        left_t = self.transform(image=left)["image"]
+        right_t = self.transform(image=right)["image"]
+        return left_t, right_t
+
+def get_tta_transforms(img_size: int) -> List[A.Compose]:
+    base = [A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]), ToTensorV2()]
+    transforms = []
+    transforms.append(A.Compose([A.Resize(img_size, img_size, interpolation=cv2.INTER_AREA), *base]))
+    transforms.append(A.Compose([A.HorizontalFlip(p=1.0), A.Resize(img_size, img_size, interpolation=cv2.INTER_AREA), *base]))
+    # Removed vertical flip for speed
+    return transforms
+
+def strip_module_prefix(state_dict: dict) -> dict:
+    if not state_dict: return state_dict
+    keys = list(state_dict.keys())
+    if all(k.startswith("module.") for k in keys):
+        return {k[len("module."):]: v for k, v in state_dict.items()}
+    return state_dict
+
+def load_checkpoint(path: str) -> dict:
+    if not os.path.exists(path): raise FileNotFoundError(f"Checkpoint not found: {path}")
+    try: state = torch.load(path, map_location="cpu", weights_only=False)
+    except TypeError: state = torch.load(path, map_location="cpu")
+    return state
+
+def load_model_from_checkpoint(ckpt_path: str) -> nn.Module:
+    state = load_checkpoint(ckpt_path)
+    cfg_dict = state.get("cfg", {})
+    update_cfg_from_checkpoint(cfg_dict)
+    dropout = cfg_dict.get("dropout", CFG.dropout)
+    hidden_ratio = cfg_dict.get("hidden_ratio", CFG.hidden_ratio)
+    model = CrossPVT_T2T_MambaDINO(dropout=dropout, hidden_ratio=hidden_ratio)
+    model_state = state.get("model_state", state)
+    model_state = strip_module_prefix(model_state)
+    missing_keys, unexpected_keys = model.load_state_dict(model_state, strict=False)
+    model.to(INF_CFG.DEVICE)
+    model.eval()
+    input_res = getattr(model, "input_res", 518)
+    return model
+
+def pack5_targets(total: torch.Tensor, gdm: torch.Tensor, green: torch.Tensor) -> torch.Tensor:
+    clover = gdm - green
+    dead = total - gdm
+    return torch.cat([green, dead, clover, gdm, total], dim=1)
+
+@torch.no_grad()
+def predict_one_view(models: List[nn.Module], loader: DataLoader) -> np.ndarray:
+    preds_list = []
+    amp_dtype = "cuda" if INF_CFG.DEVICE.type == "cuda" else "cpu"
+    for xl, xr in tqdm(loader, desc="  Predicting", leave=False):
+        xl = xl.to(INF_CFG.DEVICE, non_blocking=True)
+        xr = xr.to(INF_CFG.DEVICE, non_blocking=True)
+        x_cat = torch.cat([xl, xr], dim=1)
+        per_model_preds = []
+        with torch.amp.autocast(amp_dtype, enabled=INF_CFG.MIXED_PRECISION):
+            for model in models:
+                out = model(x_cat, return_features=False)
+                total = out["total"]
+                gdm = out["gdm"]
+                green = out["green"]
+                five = pack5_targets(total, gdm, green)
+                five = torch.clamp(five, min=0.0)
+                per_model_preds.append(five.float().cpu())
+        stacked = torch.mean(torch.stack(per_model_preds, dim=0), dim=0)
+        preds_list.append(stacked.numpy())
+    return np.concatenate(preds_list, axis=0)
+
+def run_inference(test_df: pd.DataFrame, image_dir: str) -> np.ndarray:
+    models = []
+    input_res = None
+    for fold in range(INF_CFG.N_FOLDS):
+        ckpt_path = INF_CFG.CKPT_PATTERN_FOLD_X.format(fold=fold)
+        if not os.path.exists(ckpt_path):
+            ckpt_path = INF_CFG.CKPT_PATTERN_FOLDX.format(fold=fold)
+        if not os.path.exists(ckpt_path): continue
+        model = load_model_from_checkpoint(ckpt_path)
+        models.append(model)
+        if input_res is None: input_res = getattr(model, "input_res", 518)
+    if len(models) == 0:
+        raise RuntimeError("No checkpoints found!")
+    if INF_CFG.USE_TTA:
+        tta_transforms = get_tta_transforms(input_res)
+        per_view_preds = []
+        for transform in tta_transforms:
+            ds = TestBiomassDataset(test_df, transform, image_dir)
+            dl = DataLoader(ds, batch_size=INF_CFG.BATCH_SIZE, shuffle=False, num_workers=INF_CFG.NUM_WORKERS, pin_memory=True)
+            view_pred = predict_one_view(models, dl)
+            per_view_preds.append(view_pred)
+        final_pred = np.mean(per_view_preds, axis=0)
+    else:
+        transform = get_tta_transforms(input_res)[0]
+        ds = TestBiomassDataset(test_df, transform, image_dir)
+        dl = DataLoader(ds, batch_size=INF_CFG.BATCH_SIZE, shuffle=False, num_workers=INF_CFG.NUM_WORKERS, pin_memory=True)
+        final_pred = predict_one_view(models, dl)
+    return final_pred
+
+def create_submission(final_pred: np.ndarray, test_long: pd.DataFrame, test_unique: pd.DataFrame) -> pd.DataFrame:
+    def clean(x):
+        x = np.nan_to_num(x, nan=0.0, posinf=0.0, neginf=0.0)
+        return np.maximum(0, x)
+    green, dead, clover, gdm, total = map(clean, [final_pred[:,0], final_pred[:,1], final_pred[:,2], final_pred[:,3], final_pred[:,4]])
+    wide = pd.DataFrame({"image_path": test_unique["image_path"], "Dry_Green_g": green, "Dry_Dead_g": dead, "Dry_Clover_g": clover, "GDM_g": gdm, "Dry_Total_g": total})
+    long_preds = wide.melt(id_vars=["image_path"], value_vars=INF_CFG.ALL_TARGET_COLS, var_name="target_name", value_name="target")
+    sub = pd.merge(test_long[["sample_id", "image_path", "target_name"]], long_preds, on=["image_path", "target_name"], how="left")[["sample_id", "target"]]
+    sub["target"] = np.nan_to_num(sub["target"], nan=0.0, posinf=0.0, neginf=0.0)
+    sub.to_csv(INF_CFG.SUBMISSION_FILE, index=False)
+    return sub
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="CSIRO v4 CrossPVT T2T Mamba Inference")
+    parser.add_argument("--test-csv", type=str, default=None)
+    parser.add_argument("--test-image-dir", type=str, default=None)
+    parser.add_argument("--experiment-dir", type=str, default=None)
+    parser.add_argument("--output", type=str, default=None)
+    parser.add_argument("--batch-size", type=int, default=None)
+    parser.add_argument("--no-tta", action="store_true")
+    args, _ = parser.parse_known_args()
+    return args
+
+def run_dino_inference():
+    args = parse_args()
+    if args.test_csv: INF_CFG.TEST_CSV = args.test_csv
+    if args.test_image_dir: INF_CFG.TEST_IMAGE_DIR = args.test_image_dir
+    if args.experiment_dir:
+        INF_CFG.EXPERIMENT_DIR = args.experiment_dir
+        INF_CFG.CKPT_PATTERN_FOLD_X = os.path.join(INF_CFG.EXPERIMENT_DIR, "fold_{fold}", "checkpoints", "best_wr2.pt")
+        INF_CFG.CKPT_PATTERN_FOLDX = os.path.join(INF_CFG.EXPERIMENT_DIR, "fold{fold}", "checkpoints", "best_wr2.pt")
+    if args.output: INF_CFG.SUBMISSION_FILE = args.output
+    if args.batch_size: INF_CFG.BATCH_SIZE = args.batch_size
+    if args.no_tta: INF_CFG.USE_TTA = False
+    test_long = pd.read_csv(INF_CFG.TEST_CSV)
+    test_unique = test_long.drop_duplicates(subset=["image_path"]).reset_index(drop=True)
+    final_pred = run_inference(test_unique, INF_CFG.TEST_IMAGE_DIR)
+    submission = create_submission(final_pred, test_long, test_unique)
+    gc.collect()
+    if torch.cuda.is_available(): torch.cuda.empty_cache()
+    return submission
+
+# ============================================================================
+# DINO MODEL 2 (MVP)
+# ============================================================================
+def get_input_size(model):
+    if hasattr(model, "patch_embed") and hasattr(model.patch_embed, "img_size"):
+        size = model.patch_embed.img_size
+        return int(size if isinstance(size, (int, float)) else size[0])
+    if hasattr(model, "img_size"):
+        size = model.img_size
+        return int(size if isinstance(size, (int, float)) else size[0])
+    cfg = getattr(model, "default_cfg", {}) or {}
+    input_size = cfg.get("input_size", None)
+    if input_size:
+        if isinstance(input_size, (tuple, list)) and len(input_size) >= 2:
+            return int(input_size[1])
+        return int(input_size if isinstance(input_size, (int, float)) else 224)
+    arch = cfg.get("architecture", "") or str(type(model))
+    return 518 if "dinov2" in arch.lower() or "dinov3" in arch.lower() else 224
+
+def build_backbone(name):
+    model = timm.create_model(name, pretrained=False, num_classes=0)
+    features = model.num_features
+    input_size = get_input_size(model)
+    return model, features, input_size
+
+class BaseDINO(nn.Module):
+    def __init__(self, backbone_name):
+        super().__init__()
+        self.backbone, feat_dim, input_size = build_backbone(backbone_name)
+        self.input_size = int(input_size)
+        self.feat_dim = feat_dim
+        self.combined_dim = feat_dim * 2
+        hidden_size = max(8, int(self.combined_dim * 0.25))
+        def make_head():
+            return nn.Sequential(nn.Linear(self.combined_dim, hidden_size), nn.ReLU(inplace=True), nn.Dropout(0.30), nn.Linear(hidden_size, 1))
+        self.head_green = make_head()
+        self.head_clover = make_head()
+        self.head_dead = make_head()
+        self.softplus = nn.Softplus(beta=1.0)
+
+    def merge_features(self, left_feat, right_feat):
+        combined = torch.cat([left_feat, right_feat], dim=1)
+        green = self.softplus(self.head_green(combined))
+        clover = self.softplus(self.head_clover(combined))
+        dead = self.softplus(self.head_dead(combined))
+        gdm = green + clover
+        total = gdm + dead
+        return total, gdm, green
+
+class TiledFiLMDINO(BaseDINO):
+    def __init__(self, backbone_name):
+        super().__init__(backbone_name)
+        self.grid = (2, 2)
+        class FiLM(nn.Module):
+            def __init__(self, feat_dim):
+                super().__init__()
+                hidden = max(32, feat_dim // 2)
+                self.mlp = nn.Sequential(nn.Linear(feat_dim, hidden), nn.ReLU(inplace=True), nn.Linear(hidden, feat_dim * 2))
+            def forward(self, context):
+                gamma_beta = self.mlp(context)
+                return torch.chunk(gamma_beta, 2, dim=1)
+        self.film_left = FiLM(self.feat_dim)
+        self.film_right = FiLM(self.feat_dim)
+
+    def extract_tile_features(self, x):
+        B, C, H, W = x.shape
+        rows, cols = self.grid
+        def split_dimension(length, parts):
+            step = length // parts
+            segments = []; start = 0
+            for _ in range(parts - 1):
+                segments.append((start, start + step))
+                start += step
+            segments.append((start, length))
+            return segments
+        row_segments = split_dimension(H, rows)
+        col_segments = split_dimension(W, cols)
+        features = []
+        for (rs, re) in row_segments:
+            for (cs, ce) in col_segments:
+                tile = x[:, :, rs:re, cs:ce]
+                if tile.shape[-2:] != (self.input_size, self.input_size):
+                    tile = F.interpolate(tile, size=(self.input_size, self.input_size), mode="bilinear")
+                feat = self.backbone(tile)
+                features.append(feat)
+        return torch.stack(features, dim=0).permute(1, 0, 2)
+
+    def process_stream(self, x, film_layer):
+        tiles = self.extract_tile_features(x)
+        context = tiles.mean(dim=1)
+        gamma, beta = film_layer(context)
+        modulated = tiles * (1 + gamma.unsqueeze(1)) + beta.unsqueeze(1)
+        return modulated.mean(dim=1)
+
+    def forward(self, left_img, right_img):
+        left_feat = self.process_stream(left_img, self.film_left)
+        right_feat = self.process_stream(right_img, self.film_right)
+        return self.merge_features(left_feat, right_feat)
+
+def clean_state_dict(state_dict):
+    if not state_dict: return state_dict
+    cleaned_dict = {}
+    for k, v in state_dict.items():
+        if k.startswith("module."): k = k[7:]
+        if k.startswith("student."): k = k[8:]
+        skip_prefixes = ("txt_enc.", "img_proj.", "txt_film", "teacher.", "momentum_teacher.")
+        if any(k.startswith(prefix) for prefix in skip_prefixes): continue
+        cleaned_dict[k] = v
+    return cleaned_dict
+
+def load_model(checkpoint_path, device):
+    if not os.path.exists(checkpoint_path): raise FileNotFoundError(f"Checkpoint not found: {checkpoint_path}")
+    try: raw_state = torch.load(checkpoint_path, map_location=device, weights_only=False)
+    except Exception as e: return None
+    if isinstance(raw_state, dict):
+        if 'state_dict' in raw_state: state_dict = raw_state['state_dict']
+        elif 'model' in raw_state: state_dict = raw_state['model']
+        else: state_dict = raw_state
+    else: state_dict = raw_state
+    state_dict = clean_state_dict(state_dict)
+    if not state_dict: return None
+    backbones = ["vit_base_patch14_reg4_dinov2", "vit_base_patch14_reg4_dinov3", "vit_base_patch14_dinov3"]
+    for backbone in backbones:
+        try:
+            model = TiledFiLMDINO(backbone)
+            result = model.load_state_dict(state_dict, strict=False)
+            missing = [k for k in result.missing_keys if not k.startswith('backbone.pos_embed')]
+            if len(missing) == 0:
+                model.to(device); model.eval(); return model
+        except Exception as e: continue
+    return None
+
+def get_tta_transforms_mvp(img_size):
+    norm = [A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]), ToTensorV2()]
+    return [
+        A.Compose([A.Resize(img_size, img_size), *norm]),
+        A.Compose([A.HorizontalFlip(p=1.0), A.Resize(img_size, img_size), *norm]),
+        # Removed vertical flip and rotation for speed
+    ]
+
+class BiomassDataset(Dataset):
+    def __init__(self, df, transform, img_dir):
+        self.df = df.reset_index(drop=True)
+        self.transform = transform
+        self.img_dir = img_dir
+        self.paths = self.df["image_path"].values
+
+    def __len__(self): return len(self.df)
+
+    def __getitem__(self, idx):
+        filename = os.path.basename(self.paths[idx])
+        full_path = os.path.join(self.img_dir, filename)
+        img = cv2.imread(full_path)
+        if img is None: img = np.zeros((1000, 2000, 3), dtype=np.uint8)
+        else: img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        h, w, _ = img.shape
+        mid = w // 2
+        left_img = img[:, :mid]; right_img = img[:, mid:]
+        left_tensor = self.transform(image=left_img)["image"]
+        right_tensor = self.transform(image=right_img)["image"]
+        return left_tensor, right_tensor
+
+@torch.no_grad()
+def predict_one_view_mvp(models, loader, device):
+    preds = []; use_amp = device.type == "cuda"
+    for left_imgs, right_imgs in tqdm(loader, desc="Infer MVP", leave=False):
+        left_imgs = left_imgs.to(device, non_blocking=True)
+        right_imgs = right_imgs.to(device, non_blocking=True)
+        batch_preds = []
+        with torch.amp.autocast("cuda", enabled=use_amp):
+            for model in models:
+                total, gdm, green = model(left_imgs, right_imgs)
+                dead = torch.clamp(total - gdm, min=0.0)
+                clover = torch.clamp(gdm - green, min=0.0)
+                pred = torch.cat([green, dead, clover, gdm, total], dim=1)
+                batch_preds.append(pred.clamp(0.05, 400.0).cpu())
+        preds.append(torch.stack(batch_preds).mean(dim=0).numpy())
+    return np.concatenate(preds)
+
+def run_inference_for_ckpts(checkpoint_paths, df, img_dir, device):
+    models = []
+    for ckpt_path in checkpoint_paths:
+        model = load_model(ckpt_path, device)
+        if model is not None: models.append(model)
+    if not models: raise ValueError(f"No models loaded from {checkpoint_paths}")
+    input_size = models[0].input_size
+    tta_preds = []
+    for transform in get_tta_transforms_mvp(input_size):
+        ds = BiomassDataset(df, transform, img_dir)
+        dl = DataLoader(ds, batch_size=4, shuffle=False, num_workers=0, pin_memory=True)
+        tta_preds.append(predict_one_view_mvp(models, dl, device))
+    return np.mean(tta_preds, axis=0)
+
+def create_submission_mvp(final_preds, test_df, unique_df):
+    cols = ["Dry_Green_g", "Dry_Dead_g", "Dry_Clover_g", "GDM_g", "Dry_Total_g"]
+    wide = pd.DataFrame({"image_path": unique_df["image_path"]})
+    for i, col in enumerate(cols): wide[col] = np.clip(final_preds[:, i], 0.05, 400.0)
+    wide["GDM_g"] = wide["Dry_Green_g"] + wide["Dry_Clover_g"]
+    wide["Dry_Total_g"] = wide["GDM_g"] + wide["Dry_Dead_g"]
+    wide[cols] = wide[cols].clip(0.05, 400.0)
+    long_df = wide.melt(id_vars="image_path", value_vars=cols, var_name="target_name", value_name="target")
+    sub = test_df[["sample_id", "image_path", "target_name"]].merge(long_df, on=["image_path", "target_name"], how="left")[["sample_id", "target"]]
+    sub.to_csv("submission2.csv", index=False)
+    return sub
+
+def run_mvp_inference():
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    test_csv = "/kaggle/input/csiro-biomass/test.csv"
+    test_img_dir = "/kaggle/input/csiro-biomass/test"
+    model_dir = "/kaggle/input/csiro-mvp-models"
+    model_paths = [os.path.join(model_dir, f"model{i}.pth") for i in range(1, 11)]
+    existing_models = [path for path in model_paths if os.path.exists(path)]
+    
+    # Reduced to only use first 5 models for speed
+    CKPTS_A = existing_models[:5]
+    CKPTS_B = existing_models[5:7] if len(existing_models) > 5 else []  # Use only 2 from second set
+    
+    W_A, W_B = 0.95, 0.075
+    test_df = pd.read_csv(test_csv)
+    unique_df = test_df.drop_duplicates("image_path").reset_index(drop=True)
+    pred_a = run_inference_for_ckpts(CKPTS_A, unique_df, test_img_dir, device)
+    
+    if CKPTS_B:
+        pred_b = run_inference_for_ckpts(CKPTS_B, unique_df, test_img_dir, device)
+        final_preds = W_A * pred_a + W_B * pred_b
+    else:
+        final_preds = pred_a
+    
+    submission = create_submission_mvp(final_preds, test_df, unique_df)
+    return submission
+
+# ============================================================================
+# MAIN FUNCTION WITH TIMEOUT MANAGEMENT
+# ============================================================================
+def main():
+    # Initialize timeout manager - adjust based on competition limits
+    # Typical Kaggle code competition: 9 hours
+    timeout_mgr = TimeoutManager(max_time_seconds=8.5 * 3600)  # 8.5 hours with 30min buffer
+    
+    seeding(42)
+    timeout_mgr.log_time("Started execution")
+    
+    # Default to sample submission in case of errors
+    try:
+        sample_sub_path = cfg.DATA_PATH / 'sample_submission.csv'
+        if os.path.exists(sample_sub_path):
+            sample_sub = pd.read_csv(sample_sub_path)
+            sample_sub.to_csv('submission.csv', index=False)
+            print("Created fallback submission from sample")
+    except Exception as e:
+        print(f"Warning: Could not create fallback submission: {e}")
+    
+    # ========================================================================
+    # PART 1: SigLIP/Ensemble Model (Fastest, most reliable)
+    # ========================================================================
+    if timeout_mgr.should_continue(buffer_seconds=6*3600):  # Need 6+ hours remaining
+        try:
+            print("\n" + "="*80)
+            print("PART 1: SigLIP/Ensemble Model")
+            print("="*80)
+            
+            test_df = pd.read_csv(cfg.DATA_PATH/'test.csv')
+            test_df = pivot_table(df=test_df)
+            test_df['image_path'] = test_df['image_path'].apply(lambda p: str(cfg.DATA_PATH / p))
+            
+            # Check if we have pre-computed embeddings to save time
+            train_embeddings_path = "/kaggle/input/csiro-datasplit/csiro_data_split.csv"
+            if os.path.exists(train_embeddings_path):
+                train_siglip_df = pd.read_csv(train_embeddings_path)
+                print("Loaded pre-computed training embeddings")
+            else:
+                print("Warning: Pre-computed embeddings not found, this will be slow")
+                train_df = pd.read_csv(cfg.DATA_PATH/'train.csv')
+                train_df = pivot_table(df=train_df)
+                train_df['image_path'] = train_df['image_path'].apply(lambda p: str(cfg.DATA_PATH / p))
+                train_siglip_df = train_df
+            
+            timeout_mgr.log_time("Loaded training data")
+            
+            siglip_path = "/kaggle/input/google-siglip-so400m-patch14-384/transformers/default/1"
+            test_siglip_df = compute_embeddings(model_path=siglip_path, df=test_df, patch_size=520)
+            
+            flush()
+            timeout_mgr.log_time("Computed test embeddings")
+            
+            X_all_emb = np.vstack([train_siglip_df.filter(like="emb").values, test_siglip_df.filter(like="emb").values])
+            try:
+                all_semantic_scores = generate_semantic_features(X_all_emb, model_path=siglip_path)
+                n_train = len(train_siglip_df)
+                sem_train_full = all_semantic_scores[:n_train]
+                sem_test_full = all_semantic_scores[n_train:]
+                timeout_mgr.log_time("Generated semantic features")
+            except Exception as e:
+                print(f"Semantic feature generation failed: {e}")
+                sem_train_full = None
+                sem_test_full = None
+            
+            feat_engine = SupervisedEmbeddingEngine(n_pca=0.80, n_pls=8, n_gmm=6)
+            
+            # Only run the best 2 models instead of 4
+            print("\nRunning LightGBM...")
+            oof_lgbm, pred_test_lgbm = cross_validate(
+                LGBMRegressor(verbose=-1, n_estimators=100),  # Reduced estimators
+                train_siglip_df, test_siglip_df, 
+                feature_engine=feat_engine, 
+                semantic_train=sem_train_full, 
+                semantic_test=sem_test_full, 
+                target_transform='max'
+            )
+            compare_results(oof_lgbm, train_siglip_df)
+            timeout_mgr.log_time("Completed LightGBM")
+            
+            print("\nRunning CatBoost...")
+            oof_cat, pred_test_cat = cross_validate(
+                CatBoostRegressor(verbose=0, iterations=100),  # Reduced iterations
+                train_siglip_df, test_siglip_df, 
+                feature_engine=feat_engine, 
+                semantic_train=sem_train_full, 
+                semantic_test=sem_test_full
+            )
+            compare_results(oof_cat, train_siglip_df)
+            timeout_mgr.log_time("Completed CatBoost")
+            
+            # Average only 2 models
+            pred_test = (pred_test_lgbm + pred_test_cat) / 2
+            test_df[TARGET_NAMES] = pred_test
+            test_df = post_process_biomass(test_df)
+            sub_df = melt_table(test_df)
+            sub_df[['sample_id', 'target']].to_csv("submission1.csv", index=False)
+            
+            print("✓ SigLIP/Ensemble submission created successfully")
+            timeout_mgr.log_time("Completed SigLIP ensemble")
+            
+        except Exception as e:
+            print(f"✗ SigLIP/Ensemble failed: {e}")
+            # Use sample submission as fallback
+            try:
+                sample = pd.read_csv(cfg.DATA_PATH / 'sample_submission.csv')
+                sample.to_csv("submission1.csv", index=False)
+            except:
+                pass
+    else:
+        print("\n⚠ Skipping SigLIP/Ensemble - insufficient time")
+        try:
+            sample = pd.read_csv(cfg.DATA_PATH / 'sample_submission.csv')
+            sample.to_csv("submission1.csv", index=False)
+        except:
+            pass
+    
+    # ========================================================================
+    # PART 2: DINO Model 1 (CrossPVT)
+    # ========================================================================
+    if timeout_mgr.should_continue(buffer_seconds=3*3600):  # Need 3+ hours remaining
+        try:
+            print("\n" + "="*80)
+            print("PART 2: DINO Model 1 (CrossPVT)")
+            print("="*80)
+            
+            # Disable TTA if time is tight
+            if timeout_mgr.time_remaining() < 4 * 3600:
+                print("⚠ Limited time - disabling TTA")
+                INF_CFG.USE_TTA = False
+            
+            run_dino_inference()
+            print("✓ DINO Model 1 submission created successfully")
+            timeout_mgr.log_time("Completed DINO Model 1")
+            
+        except Exception as e:
+            print(f"✗ DINO Model 1 failed: {e}")
+            # Copy submission1 as fallback
+            try:
+                if os.path.exists("submission1.csv"):
+                    shutil.copy("submission1.csv", "submission3.csv")
+                else:
+                    sample = pd.read_csv(cfg.DATA_PATH / 'sample_submission.csv')
+                    sample.to_csv("submission3.csv", index=False)
+            except:
+                pass
+    else:
+        print("\n⚠ Skipping DINO Model 1 - insufficient time")
+        try:
+            if os.path.exists("submission1.csv"):
+                shutil.copy("submission1.csv", "submission3.csv")
+            else:
+                sample = pd.read_csv(cfg.DATA_PATH / 'sample_submission.csv')
+                sample.to_csv("submission3.csv", index=False)
+        except:
+            pass
+    
+    # ========================================================================
+    # PART 3: DINO Model 2 (MVP)
+    # ========================================================================
+    if timeout_mgr.should_continue(buffer_seconds=2*3600):  # Need 2+ hours remaining
+        try:
+            print("\n" + "="*80)
+            print("PART 3: DINO Model 2 (MVP)")
+            print("="*80)
+            
+            run_mvp_inference()
+            print("✓ DINO Model 2 submission created successfully")
+            timeout_mgr.log_time("Completed DINO Model 2")
+            
+        except Exception as e:
+            print(f"✗ DINO Model 2 failed: {e}")
+            # Copy submission1 as fallback
+            try:
+                if os.path.exists("submission1.csv"):
+                    shutil.copy("submission1.csv", "submission2.csv")
+                else:
+                    sample = pd.read_csv(cfg.DATA_PATH / 'sample_submission.csv')
+                    sample.to_csv("submission2.csv", index=False)
+            except:
+                pass
+    else:
+        print("\n⚠ Skipping DINO Model 2 - insufficient time")
+        try:
+            if os.path.exists("submission1.csv"):
+                shutil.copy("submission1.csv", "submission2.csv")
+            else:
+                sample = pd.read_csv(cfg.DATA_PATH / 'sample_submission.csv')
+                sample.to_csv("submission2.csv", index=False)
+        except:
+            pass
+    
+    # ========================================================================
+    # PART 4: Ensemble Final Submissions
+    # ========================================================================
+    try:
+        print("\n" + "="*80)
+        print("PART 4: Creating Final Ensemble")
+        print("="*80)
+        
+        submission1 = pd.read_csv('submission1.csv')
+        submission2 = pd.read_csv('submission2.csv')
+        submission3 = pd.read_csv('submission3.csv')
+        
+        merged = pd.merge(submission1, submission2, on='sample_id', suffixes=('_1', '_2'))
+        merged = pd.merge(merged, submission3, on='sample_id')
+        if 'target' in merged.columns and 'target_1' in merged.columns and 'target_2' in merged.columns:
+            merged = merged.rename(columns={'target': 'target_3'})
+        
+        # Weighted ensemble
+        weight1, weight2, weight3 = 0.5, 0.25, 0.25
+        merged['target'] = (
+            merged['target_1'] * weight1 + 
+            merged['target_2'] * weight2 + 
+            merged['target_3'] * weight3
+        )
+        
+        final_submission = merged[['sample_id', 'target']]
+        final_submission.to_csv('submission.csv', index=False)
+        
+        print("✓ Final ensemble submission created successfully")
+        timeout_mgr.log_time("Completed final ensemble")
+        
+    except Exception as e:
+        print(f"✗ Ensemble failed: {e}")
+        # Use best available submission as fallback
+        for fallback in ['submission1.csv', 'submission3.csv', 'submission2.csv']:
+            if os.path.exists(fallback):
+                shutil.copy(fallback, 'submission.csv')
+                print(f"Using {fallback} as final submission")
+                break
+    
+    timeout_mgr.log_time("Execution completed")
+    print("\n" + "="*80)
+    print("EXECUTION COMPLETE")
+    print("="*80)
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        print(f"CRITICAL ERROR: {e}")
+        import traceback
+        traceback.print_exc()
+        # Emergency fallback - create sample submission
+        try:
+            sample_path = "/kaggle/input/csiro-biomass/sample_submission.csv"
+            if os.path.exists(sample_path):
+                sample = pd.read_csv(sample_path)
+                sample.to_csv('submission.csv', index=False)
+                print("Created emergency fallback submission")
+        except:
+            print("Could not create emergency fallback")
